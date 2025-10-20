@@ -1,0 +1,23 @@
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+psycopg2-binary==2.9.9
+geopandas==0.14.1
+folium==0.15.1
+geemap==0.33.0
+earthengine-api==0.1.375
+shapely==2.0.2
+# gdal==3.7.3
+pillow==10.1.0
+numpy==1.24.4
+pandas==2.1.4
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.17.0
+django-leaflet==0.28.0
+django-geojson==3.0.0
+celery==5.3.4
+redis==5.0.1
+python-dotenv==1.0.0
+whitenoise==6.6.0
+gunicorn==21.2.0
