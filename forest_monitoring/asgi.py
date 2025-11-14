@@ -1,5 +1,5 @@
 """
-ASGI config for forest_monitoring project.
+ASGI config for agri_insight project.
 """
 
 import os

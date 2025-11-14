@@ -33,7 +33,8 @@ class AreaOfInterestSerializer(serializers.ModelSerializer):
         # Handle anonymous users by creating a default user or using a system user
         user = self.context['request'].user
         if not user.is_authenticated:
-            from django.contrib.auth.models import User
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
             user, created = User.objects.get_or_create(
                 username='anonymous',
                 defaults={'email': 'anonymous@example.com'}
@@ -168,7 +169,8 @@ class AreaOfInterestCreateSerializer(serializers.Serializer):
         # Handle anonymous users
         user = self.context['request'].user
         if not user.is_authenticated:
-            from django.contrib.auth.models import User
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
             user, created = User.objects.get_or_create(
                 username='anonymous',
                 defaults={'email': 'anonymous@example.com'}

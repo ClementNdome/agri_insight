@@ -38,7 +38,7 @@ def run_migrations(python_executable):
 def create_superuser(python_executable):
     """Create superuser if it doesn't exist"""
     # Check if superuser exists
-    check_command = f'{python_executable} manage.py shell -c "from django.contrib.auth.models import User; print(User.objects.filter(is_superuser=True).exists())"'
+    check_command = f'{python_executable} manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(is_superuser=True).exists())"'
     result = subprocess.run(check_command, shell=True, capture_output=True, text=True)
     
     if 'True' in result.stdout:

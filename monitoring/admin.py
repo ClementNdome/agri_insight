@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 from .models import (
-    AreaOfInterest, VegetationIndex, SatelliteImage, 
-    MonitoringData, MonitoringAlert, MonitoringConfiguration
+    AreaOfInterest, VegetationIndex, SatelliteImage,
+    MonitoringData, MonitoringAlert, MonitoringConfiguration, Tip
 )
 
 
@@ -120,6 +120,27 @@ class MonitoringConfigurationAdmin(admin.ModelAdmin):
         }),
         ('Data Processing Settings', {
             'fields': ('cloud_cover_threshold', 'min_pixel_count')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(Tip)
+class TipAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'is_active', 'order', 'created_at']
+    list_filter = ['category', 'is_active', 'created_at']
+    search_fields = ['title', 'content']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Tip Information', {
+            'fields': ('title', 'content', 'category', 'image_url')
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'order')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),

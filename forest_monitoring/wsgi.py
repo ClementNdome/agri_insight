@@ -1,5 +1,5 @@
 """
-WSGI config for forest_monitoring project.
+WSGI config for agri_insight project.
 """
 
 import os

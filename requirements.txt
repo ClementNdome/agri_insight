@@ -1,23 +1,81 @@
-Django==4.2.7
-djangorestframework==3.14.0
+# Core Django
+Django==5.1.0
+djangorestframework==3.15.0
 django-cors-headers==4.3.1
+
+# Database
 psycopg2-binary==2.9.9
-geopandas==0.14.1
+dj-database-url==2.1.0
+
+# GeoDjango and Spatial
+geopandas==1.0.0
+rasterio==1.4.0
+shapely==2.0.2
 folium==0.15.1
 geemap==0.33.0
 earthengine-api==0.1.375
-shapely==2.0.2
-# gdal==3.7.3
-pillow==10.1.0
+django-leaflet==0.28.0
+django-geojson==3.0.0
+
+# Data Processing
 numpy==1.24.4
 pandas==2.1.4
 matplotlib==3.8.2
 seaborn==0.13.0
 plotly==5.17.0
-django-leaflet==0.28.0
-django-geojson==3.0.0
+pillow==10.1.0
+
+# AI/ML for Yield Prediction
+tensorflow==2.17.0
+scikit-learn==1.4.0
+
+# Task Queue
 celery==5.3.4
 redis==5.0.1
+
+# Authentication
+django-allauth==0.57.0
+django-ratelimit==4.1.0
+
+# Admin Interface
+django-jazzmin==2.6.0
+django-import-export==4.0.5
+
+# Testing
+pytest==8.0.0
+pytest-django==4.8.0
+pytest-cov==4.1.0
+
+# Documentation
+drf-spectacular==0.27.0
+
+# Utilities
 python-dotenv==1.0.0
 whitenoise==6.6.0
 gunicorn==21.2.0
+tenacity==8.2.3
+
+# Reporting
+weasyprint==60.2
+
+# Email/SMS
+django-celery-email==3.0.0
+twilio==9.0.0
+
+# WebSockets
+channels==4.0.0
+channels-redis==4.2.0
+
+# Code Quality
+black==24.1.0
+autopep8==2.0.4
+flake8==7.0.0
+mypy==1.8.0
+
+# Security
+bandit==1.7.5
+django-check-seo==0.7.0
+
+# Performance
+django-redis==5.4.0
+django-silk==5.0.3

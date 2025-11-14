@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Demo - Agri Insight{% endblock %}
+
+{% block extra_css %}
+<style>
+    .demo-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+    }
+    .demo-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    .demo-map-container {
+        height: 400px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #667eea;
+        margin: 2rem 0;
+    }
+    .demo-feature {
+        padding: 1.5rem;
+        border-left: 4px solid #667eea;
+        background: #f8f9fa;
+        margin-bottom: 1rem;
+        border-radius: 5px;
+    }
+    .demo-cta {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-top: 3rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="demo-hero">
+    <div class="container text-center">
+        <h1 class="display-4 mb-3"><i class="fas fa-eye"></i> Demo Preview</h1>
+        <p class="lead">Get a glimpse of what Agri Insight can do for your farm</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="demo-card">
+        <h3 class="mb-4"><i class="fas fa-info-circle text-primary"></i> What You'll See</h3>
+        <p class="lead">This is a limited preview of Agri Insight's capabilities. To access the full features, please sign up for a free account.</p>
+    </div>
+
+    <!-- Map Preview -->
+    <div class="demo-card">
+        <h4 class="mb-3"><i class="fas fa-map-marked-alt text-primary"></i> Interactive Map</h4>
+        <div class="demo-map-container">
+            <div class="text-center">
+                <i class="fas fa-map fa-4x text-muted mb-3"></i>
+                <p class="text-muted">Interactive map with satellite imagery</p>
+                <p class="small text-muted">Draw areas, analyze vegetation, and monitor your farms</p>
+            </div>
+        </div>
+        <p class="text-muted mt-3">With Agri Insight, you can:</p>
+        <ul class="list-unstyled">
+            <li class="demo-feature">
+                <i class="fas fa-check-circle text-success"></i> Draw custom farm areas on the map
+            </li>
+            <li class="demo-feature">
+                <i class="fas fa-check-circle text-success"></i> Analyze vegetation indices (NDVI, EVI, SAVI, etc.)
+            </li>
+            <li class="demo-feature">
+                <i class="fas fa-check-circle text-success"></i> View real-time satellite imagery from Google Earth Engine
+            </li>
+            <li class="demo-feature">
+                <i class="fas fa-check-circle text-success"></i> Track historical data and trends
+            </li>
+        </ul>
+    </div>
+
+    <!-- Features Preview -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="demo-card">
+                <h5><i class="fas fa-chart-line text-primary"></i> Vegetation Monitoring</h5>
+                <p class="text-muted">Monitor crop health using advanced vegetation indices:</p>
+                <ul>
+                    <li>NDVI - Normalized Difference Vegetation Index</li>
+                    <li>EVI - Enhanced Vegetation Index</li>
+                    <li>SAVI - Soil Adjusted Vegetation Index</li>
+                    <li>NDMI - Normalized Difference Moisture Index</li>
+                    <li>And more...</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="demo-card">
+                <h5><i class="fas fa-bell text-primary"></i> Smart Alerts</h5>
+                <p class="text-muted">Get notified about important changes:</p>
+                <ul>
+                    <li>Vegetation health alerts</li>
+                    <li>Moisture level warnings</li>
+                    <li>Anomaly detection</li>
+                    <li>Customizable thresholds</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Preview -->
+    {% if tips %}
+    <div class="demo-card">
+        <h4 class="mb-3"><i class="fas fa-lightbulb text-primary"></i> Sustainable Farming Tips</h4>
+        <div class="row">
+            {% for tip in tips %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ tip.title }}</h6>
+                        <p class="card-text small">{{ tip.content|truncatewords:20 }}</p>
+                        <small class="text-muted">
+                            <i class="bi bi-tag"></i> {{ tip.get_category_display }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- CTA -->
+    <div class="demo-cta">
+        <h2 class="mb-3">Ready to Experience the Full Power?</h2>
+        <p class="lead mb-4">Sign up now to access all features and start monitoring your farms today!</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg px-4">
+                <i class="fas fa-user-plus"></i> Sign Up Free
+            </a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="{% url 'landing' %}" class="btn btn-outline-light btn-lg px-4">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

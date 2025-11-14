@@ -1,5 +1,5 @@
 """
-Django settings for forest_monitoring project.
+Django settings for agri_insight project.
 """
 
 import os
@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # 'corsheaders',  # Temporarily disabled
     # 'leaflet',  # Temporarily disabled
+    'accounts',
     'monitoring',
 ]
 
@@ -71,11 +72,15 @@ WSGI_APPLICATION = 'forest_monitoring.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.getenv('DB_NAME', 'forest_monitoring'),
+        'NAME': os.getenv('DB_NAME', 'agri_insight'),
         'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '0323'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {
+            'options': '-c search_path=public'
+        },
+        'CONN_MAX_AGE': 600,
     }
 }
 
@@ -115,6 +120,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.User'
+
+# Login/Logout URLs
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/landing/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
 # GeoDjango settings
 GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', 'C:/OSGeo4W64/bin/gdal310.dll')
 GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', 'C:/OSGeo4W/bin/geos_c.dll')
@@ -142,6 +155,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://app.spationex.com",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://app.spationex.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -153,7 +170,7 @@ LEAFLET_CONFIG = {
     'MIN_ZOOM': 1,
     'MAX_ZOOM': 18,
     'DEFAULT_PRECISION': 6,
-    'ATTRIBUTION_PREFIX': 'Forest Monitoring System',
+    'ATTRIBUTION_PREFIX': 'Agri Insight System',
     'RESET_VIEW': False,
     'SCALE': 'both',
     'MINIMAP': True,
@@ -214,3 +231,4 @@ LOGGING = {
         },
     },
 }
+

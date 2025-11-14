@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Agri Insight{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        padding: 2rem;
+        max-width: 400px;
+        width: 100%;
+    }
+    .logo {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .logo h1 {
+        color: #667eea;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="login-card">
+        <div class="logo">
+            <h1><i class="fas fa-seedling"></i> Agri Insight</h1>
+            <p class="text-muted">Welcome back</p>
+        </div>
+        
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Error:</strong> Please correct the errors below.
+            </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" 
+                       class="form-control" required autofocus>
+                {% if form.username.errors %}
+                    <div class="text-danger">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" 
+                       class="form-control" required>
+                {% if form.password.errors %}
+                    <div class="text-danger">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="remember_me" id="remember_me" class="form-check-input">
+                <label class="form-check-label" for="remember_me">
+                    Remember me
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+            
+            <div class="text-center">
+                <p><a href="{% url 'accounts:password_reset' %}">Forgot password?</a></p>
+                <p>Don't have an account? <a href="{% url 'accounts:signup' %}">Sign up</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
