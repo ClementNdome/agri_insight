@@ -96,6 +96,19 @@ class GoogleEarthEngineService:
         # OSAVI - Optimized Soil Adjusted Vegetation Index
         indices['OSAVI'] = nir.subtract(red).divide(nir.add(red).add(0.16)).multiply(1.16).rename('OSAVI')
         
+        # NDRE - Normalized Difference Red Edge (uses B5 for red edge)
+        red_edge = image.select('B5')  # Red Edge band
+        indices['NDRE'] = nir.subtract(red_edge).divide(nir.add(red_edge)).rename('NDRE')
+        
+        # CIRE - Chlorophyll Index Red Edge
+        indices['CIRE'] = nir.divide(red_edge).subtract(1).rename('CIRE')
+        
+        # LAI - Leaf Area Index (simplified estimation using NDVI)
+        # LAI ≈ -ln(1-NDVI)/k where k is extinction coefficient (typically 0.5-0.7)
+        # Using simplified formula: LAI = 3.618 * NDVI - 0.118 (empirical relationship)
+        ndvi = indices['NDVI']
+        indices['LAI'] = ndvi.multiply(3.618).subtract(0.118).max(0).rename('LAI')
+        
         return indices
     
     def get_sentinel2_images(self, geometry: ee.Geometry, start_date: str, end_date: str, 
@@ -353,6 +366,98 @@ class VegetationIndexCalculator:
             logger.error(f"Error creating monitoring visualization: {e}")
             raise
     
+    def calculate_for_area(self, area, vegetation_index, start_date, end_date, satellite='SENTINEL2'):
+        """Calculate monitoring data for an area and save to database"""
+        from .models import MonitoringData, SatelliteImage, VegetationIndex
+        from datetime import datetime
+        
+        try:
+            # Process monitoring data
+            results = self.process_area_monitoring(
+                area_of_interest=area,
+                vegetation_index_name=vegetation_index.name,
+                start_date=start_date.strftime('%Y-%m-%d'),
+                end_date=end_date.strftime('%Y-%m-%d'),
+                satellite=satellite
+            )
+            
+            if not results:
+                logger.warning(f"No results returned for area {area.name} and index {vegetation_index.name}")
+                return False
+            
+            # Save results to database
+            created_count = 0
+            for result in results:
+                try:
+                    # Parse acquisition date
+                    if isinstance(result['acquisition_date'], str):
+                        # Handle timestamp strings
+                        if 'T' in result['acquisition_date']:
+                            acquisition_date = datetime.fromisoformat(result['acquisition_date'].replace('Z', '+00:00')).date()
+                        else:
+                            acquisition_date = datetime.strptime(result['acquisition_date'], '%Y-%m-%d').date()
+                    else:
+                        acquisition_date = result['acquisition_date']
+                    
+                    # Get or create satellite image
+                    # Use area geometry as bounds, or create a simple bounding box
+                    from django.contrib.gis.geos import GEOSGeometry
+                    bounds = area.geometry.envelope  # Use envelope as bounds
+                    resolution = 10.0 if satellite == 'SENTINEL2' else 30.0  # Default resolution
+                    
+                    satellite_image, _ = SatelliteImage.objects.get_or_create(
+                        image_id=result.get('image_id', f"unknown_{acquisition_date}"),
+                        defaults={
+                            'satellite': satellite,
+                            'acquisition_date': acquisition_date,
+                            'cloud_cover': result.get('cloud_cover', 0),
+                            'resolution': resolution,
+                            'bounds': bounds
+                        }
+                    )
+                    
+                    # Create or update monitoring data
+                    # Use get_or_create with acquisition_date from satellite_image
+                    monitoring_data, created = MonitoringData.objects.get_or_create(
+                        area_of_interest=area,
+                        vegetation_index=vegetation_index,
+                        satellite_image=satellite_image,
+                        defaults={
+                            'acquisition_date': satellite_image.acquisition_date,
+                            'mean_value': result.get('mean_value', 0),
+                            'min_value': result.get('min_value', 0),
+                            'max_value': result.get('max_value', 0),
+                            'std_value': result.get('std_value', 0),
+                            'pixel_count': result.get('pixel_count', 0),
+                            'processing_status': 'COMPLETED'
+                        }
+                    )
+                    
+                    if not created:
+                        # Update existing record
+                        monitoring_data.mean_value = result.get('mean_value', 0)
+                        monitoring_data.min_value = result.get('min_value', 0)
+                        monitoring_data.max_value = result.get('max_value', 0)
+                        monitoring_data.std_value = result.get('std_value', 0)
+                        monitoring_data.pixel_count = result.get('pixel_count', 0)
+                        monitoring_data.processing_status = 'COMPLETED'
+                        monitoring_data.save()
+                    
+                    created_count += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error saving monitoring data: {e}")
+                    continue
+            
+            logger.info(f"Created/updated {created_count} monitoring data records for area {area.name}")
+            return created_count > 0
+            
+        except Exception as e:
+            logger.error(f"Error calculating for area: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return False
+    
     def _generate_mock_data(self, area_of_interest, vegetation_index_name: str, 
                            start_date: str, end_date: str) -> List[Dict]:
         """Generate mock monitoring data for testing"""
@@ -377,6 +482,10 @@ class VegetationIndexCalculator:
                 mean_val = random.uniform(0.3, 0.8)
             elif vegetation_index_name == 'EVI':
                 mean_val = random.uniform(0.2, 0.6)
+            elif vegetation_index_name == 'LAI':
+                mean_val = random.uniform(0.5, 6.0)  # LAI typically ranges 0-6
+            elif vegetation_index_name in ['NDRE', 'CIRE']:
+                mean_val = random.uniform(0.1, 0.8)
             else:
                 mean_val = random.uniform(0.1, 0.9)
             
