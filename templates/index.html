@@ -1,223 +1,268 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forest Monitoring System</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        #map {
-            height: 600px;
-            width: 100%;
-        }
-        .sidebar {
-            height: 100vh;
-            overflow-y: auto;
-        }
-        .area-card {
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        .area-card:hover {
-            background-color: #f8f9fa;
-        }
-        .vegetation-index-card {
-            margin-bottom: 10px;
-        }
-        .monitoring-data-table {
-            font-size: 0.9em;
-        }
-        .alert-item {
-            border-left: 4px solid #dc3545;
-            padding-left: 10px;
-            margin-bottom: 10px;
-        }
-        .alert-item.alert-warning {
-            border-left-color: #ffc107;
-        }
-        .alert-item.alert-info {
-            border-left-color: #17a2b8;
-        }
-        .alert-item.alert-success {
-            border-left-color: #28a745;
-        }
-    </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar bg-light p-3">
-                <h4><i class="fas fa-tree"></i> Forest Monitoring</h4>
-                
-                <!-- Navigation Tabs -->
-                <ul class="nav nav-tabs" id="mainTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-panel" type="button" role="tab">
-                            <i class="fas fa-map"></i> Map
+
+{% block title %}Map Dashboard - Agri Insight{% endblock %}
+
+{% block leaflet_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+    }
+    #map.leaflet-container {
+        height: 600px !important;
+    }
+    .sidebar {
+        height: 100vh;
+        overflow-y: auto;
+    }
+    .area-card {
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    .area-card:hover {
+        background-color: #f8f9fa;
+    }
+    .vegetation-index-card {
+        margin-bottom: 10px;
+    }
+    .monitoring-data-table {
+        font-size: 0.9em;
+    }
+    .alert-item {
+        border-left: 4px solid #dc3545;
+        padding-left: 10px;
+        margin-bottom: 10px;
+    }
+    .alert-item.alert-warning {
+        border-left-color: #ffc107;
+    }
+    .alert-item.alert-info {
+        border-left-color: #17a2b8;
+    }
+    .alert-item.alert-success {
+        border-left-color: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<!-- Redirect non-authenticated users -->
+<div class="container text-center py-5">
+    <div class="alert alert-warning">
+        <h4>Authentication Required</h4>
+        <p>Please login or sign up to access the dashboard.</p>
+        <div class="mt-3">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'accounts:signup' %}" class="btn btn-outline-primary">Sign Up</a>
+            <a href="{% url 'landing' %}" class="btn btn-outline-secondary">Go Home</a>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- CSRF Token for AJAX requests -->
+{% if csrf_token %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endif %}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar bg-light p-3">
+            <h4><i class="fas fa-seedling"></i> Agri Insight</h4>
+            
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-panel" type="button" role="tab">
+                        <i class="fas fa-map"></i> Map
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="areas-tab" data-bs-toggle="tab" data-bs-target="#areas-panel" type="button" role="tab">
+                        <i class="fas fa-draw-polygon"></i> Areas
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="monitoring-tab" data-bs-toggle="tab" data-bs-target="#monitoring-panel" type="button" role="tab">
+                        <i class="fas fa-chart-line"></i> Monitoring
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts-panel" type="button" role="tab">
+                        <i class="fas fa-exclamation-triangle"></i> Alerts
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content mt-3" id="mainTabContent">
+                <!-- Map Panel -->
+                <div class="tab-pane fade show active" id="map-panel" role="tabpanel">
+                    <div class="mb-3">
+                        <button class="btn btn-primary btn-sm" id="drawAreaBtn">
+                            <i class="fas fa-draw-polygon"></i> Draw Area
                         </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="areas-tab" data-bs-toggle="tab" data-bs-target="#areas-panel" type="button" role="tab">
-                            <i class="fas fa-draw-polygon"></i> Areas
+                        <button class="btn btn-secondary btn-sm" id="clearMapBtn">
+                            <i class="fas fa-trash"></i> Clear
                         </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="monitoring-tab" data-bs-toggle="tab" data-bs-target="#monitoring-panel" type="button" role="tab">
-                            <i class="fas fa-chart-line"></i> Monitoring
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts-panel" type="button" role="tab">
-                            <i class="fas fa-exclamation-triangle"></i> Alerts
-                        </button>
-                    </li>
-                </ul>
-                
-                <!-- Tab Content -->
-                <div class="tab-content mt-3" id="mainTabContent">
-                    <!-- Map Panel -->
-                    <div class="tab-pane fade show active" id="map-panel" role="tabpanel">
-                        <div class="mb-3">
-                            <button class="btn btn-primary btn-sm" id="drawAreaBtn">
-                                <i class="fas fa-draw-polygon"></i> Draw Area
-                            </button>
-                            <button class="btn btn-secondary btn-sm" id="clearMapBtn">
-                                <i class="fas fa-trash"></i> Clear
-                            </button>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Vegetation Index:</label>
-                            <select class="form-select" id="vegetationIndexSelect">
-                                <option value="NDVI">NDVI - Normalized Difference Vegetation Index</option>
-                                <option value="EVI">EVI - Enhanced Vegetation Index</option>
-                                <option value="SAVI">SAVI - Soil Adjusted Vegetation Index</option>
-                                <option value="NDMI">NDMI - Normalized Difference Moisture Index</option>
-                                <option value="NBR">NBR - Normalized Burn Ratio</option>
-                                <option value="NDWI">NDWI - Normalized Difference Water Index</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Date Range:</label>
-                            <div class="row">
-                                <div class="col-6">
-                                    <input type="date" class="form-control form-control-sm" id="startDate">
-                                </div>
-                                <div class="col-6">
-                                    <input type="date" class="form-control form-control-sm" id="endDate">
-                                </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Vegetation Index:</label>
+                        <select class="form-select" id="vegetationIndexSelect">
+                            <option value="">Loading indices...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Date Range:</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="date" class="form-control form-control-sm" id="startDate">
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control form-control-sm" id="endDate">
                             </div>
                         </div>
-                        
-                        <button class="btn btn-success btn-sm w-100" id="analyzeBtn">
-                            <i class="fas fa-search"></i> Analyze Area
+                    </div>
+                    
+                    <button class="btn btn-success btn-sm w-100" id="analyzeBtn">
+                        <i class="fas fa-search"></i> Analyze Area
+                    </button>
+                </div>
+                
+                <!-- Areas Panel -->
+                <div class="tab-pane fade" id="areas-panel" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6>Areas of Interest</h6>
+                        <button class="btn btn-primary btn-sm" id="addAreaBtn">
+                            <i class="fas fa-plus"></i> Add Area
                         </button>
                     </div>
-                    
-                    <!-- Areas Panel -->
-                    <div class="tab-pane fade" id="areas-panel" role="tabpanel">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>Areas of Interest</h6>
-                            <button class="btn btn-primary btn-sm" id="addAreaBtn">
-                                <i class="fas fa-plus"></i> Add Area
-                            </button>
-                        </div>
-                        <div id="areasList">
-                            <!-- Areas will be loaded here -->
-                        </div>
+                    <div id="areasList">
+                        <!-- Areas will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Monitoring Panel -->
+                <div class="tab-pane fade" id="monitoring-panel" role="tabpanel">
+                    <div class="mb-3">
+                        <label class="form-label">Select Area:</label>
+                        <select class="form-select" id="monitoringAreaSelect">
+                            <option value="">Select an area...</option>
+                        </select>
                     </div>
                     
-                    <!-- Monitoring Panel -->
-                    <div class="tab-pane fade" id="monitoring-panel" role="tabpanel">
-                        <div class="mb-3">
-                            <label class="form-label">Select Area:</label>
-                            <select class="form-select" id="monitoringAreaSelect">
-                                <option value="">Select an area...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Vegetation Index:</label>
-                            <select class="form-select" id="monitoringIndexSelect">
-                                <option value="">Select an index...</option>
-                            </select>
-                        </div>
-                        
-                        <button class="btn btn-primary btn-sm w-100 mb-3" id="loadMonitoringDataBtn">
-                            <i class="fas fa-chart-line"></i> Load Data
+                    <div class="mb-3">
+                        <label class="form-label">Vegetation Index:</label>
+                        <select class="form-select" id="monitoringIndexSelect">
+                            <option value="">Select an index...</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-sm w-100 mb-3" id="loadMonitoringDataBtn">
+                        <i class="fas fa-chart-line"></i> Load Data
+                    </button>
+                    
+                    <div id="monitoringData">
+                        <!-- Monitoring data will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Alerts Panel -->
+                <div class="tab-pane fade" id="alerts-panel" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6>Monitoring Alerts</h6>
+                        <button class="btn btn-secondary btn-sm" id="refreshAlertsBtn">
+                            <i class="fas fa-sync"></i> Refresh
                         </button>
-                        
-                        <div id="monitoringData">
-                            <!-- Monitoring data will be loaded here -->
-                        </div>
                     </div>
-                    
-                    <!-- Alerts Panel -->
-                    <div class="tab-pane fade" id="alerts-panel" role="tabpanel">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>Monitoring Alerts</h6>
-                            <button class="btn btn-secondary btn-sm" id="refreshAlertsBtn">
-                                <i class="fas fa-sync"></i> Refresh
-                            </button>
-                        </div>
-                        <div id="alertsList">
-                            <!-- Alerts will be loaded here -->
-                        </div>
+                    <div id="alertsList">
+                        <!-- Alerts will be loaded here -->
                     </div>
-                </div>
-            </div>
-            
-            <!-- Main Content -->
-            <div class="col-md-9">
-                <div id="map"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <!-- Add Area Modal -->
-    <div class="modal fade" id="addAreaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Area of Interest</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addAreaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Name:</label>
-                            <input type="text" class="form-control" id="areaName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description:</label>
-                            <textarea class="form-control" id="areaDescription" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveAreaBtn">Save Area</button>
                 </div>
             </div>
         </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div id="map"></div>
+        </div>
     </div>
+</div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // CSRF Token for AJAX requests
-        window.csrfToken = '{{ csrf_token }}';
-    </script>
-    <script src="{% static 'js/monitoring.js' %}"></script>
-</body>
-</html>
+<!-- Modals -->
+<!-- Add Area Modal -->
+<div class="modal fade" id="addAreaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Area of Interest</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAreaForm">
+                    <div class="mb-3">
+                        <label for="areaName" class="form-label">Name:</label>
+                        <input type="text" class="form-control" id="areaName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="areaDescription" class="form-label">Description:</label>
+                        <textarea class="form-control" id="areaDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAreaBtn">Save Area</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block leaflet_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // CSRF Token for AJAX requests
+    (function() {
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+            window.csrfToken = metaTag.getAttribute('content');
+        } else {
+            // Fallback: get CSRF token from cookie
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            window.csrfToken = getCookie('csrftoken');
+        }
+    })();
+</script>
+<script src="{% static 'js/monitoring.js' %}"></script>
+{% endblock %}

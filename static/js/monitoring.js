@@ -22,13 +22,34 @@ class ForestMonitoringSystem {
     }
     
     initMap() {
-        // Initialize map
-        this.map = L.map('map').setView([0, 0], 2);
+        // Check if map container exists
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) {
+            console.error('Map container not found');
+            return;
+        }
         
-        // Add base layer
+        // Initialize map
+        this.map = L.map('map', {
+            center: [0, 0],
+            zoom: 2,
+            zoomControl: true
+        });
+        
+        // Add base layer with proper options
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+            minZoom: 1,
+            noWrap: false
         }).addTo(this.map);
+        
+        // Force map to invalidate size after initialization
+        setTimeout(() => {
+            if (this.map) {
+                this.map.invalidateSize();
+            }
+        }, 100);
         
         // Add drawn items layer
         this.map.addLayer(this.drawnItems);
@@ -160,7 +181,15 @@ class ForestMonitoringSystem {
         }
         
         try {
+            // Get GeoJSON from the drawn area
+            // toGeoJSON() returns a Feature object, which is what we want
             const geometry = this.currentArea.toGeoJSON();
+            
+            // Validate that we have a valid geometry
+            if (!geometry || !geometry.geometry) {
+                alert('Invalid geometry. Please draw the area again.');
+                return;
+            }
             
             const response = await fetch('/api/areas/create_from_geojson/', {
                 method: 'POST',
@@ -171,7 +200,7 @@ class ForestMonitoringSystem {
                 body: JSON.stringify({
                     name: name,
                     description: description,
-                    geometry_geojson: geometry
+                    geometry_geojson: geometry  // Send the full Feature object
                 })
             });
             
@@ -300,13 +329,22 @@ class ForestMonitoringSystem {
         
         selects.forEach(selectId => {
             const select = document.getElementById(selectId);
+            if (!select) return;
+            
             const currentValue = select.value;
             
-            // Clear existing options except the first one
-            while (select.children.length > 1) {
-                select.removeChild(select.lastChild);
+            // Clear all existing options
+            select.innerHTML = '';
+            
+            // Add default option for monitoringIndexSelect
+            if (selectId === 'monitoringIndexSelect') {
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select an index...';
+                select.appendChild(defaultOption);
             }
             
+            // Add all vegetation indices
             indices.forEach(index => {
                 const option = document.createElement('option');
                 option.value = index.name;
@@ -316,7 +354,14 @@ class ForestMonitoringSystem {
             
             // Restore previous selection if it still exists
             if (currentValue) {
-                select.value = currentValue;
+                const optionExists = Array.from(select.options).some(opt => opt.value === currentValue);
+                if (optionExists) {
+                    select.value = currentValue;
+                }
+            } else if (selectId === 'vegetationIndexSelect' && indices.length > 0) {
+                // Set default to first index (NDVI if available, otherwise first)
+                const ndviIndex = indices.find(idx => idx.name === 'NDVI');
+                select.value = ndviIndex ? 'NDVI' : indices[0].name;
             }
         });
     }
@@ -360,6 +405,15 @@ class ForestMonitoringSystem {
                 }
                 
                 const geometry = this.currentArea.toGeoJSON();
+                
+                // Validate geometry
+                if (!geometry || !geometry.geometry) {
+                    alert('Invalid geometry. Please draw the area again.');
+                    analyzeBtn.innerHTML = originalText;
+                    analyzeBtn.disabled = false;
+                    return;
+                }
+                
                 const saveResponse = await fetch('/api/areas/create_from_geojson/', {
                     method: 'POST',
                     headers: {
@@ -369,7 +423,7 @@ class ForestMonitoringSystem {
                     body: JSON.stringify({
                         name: areaName,
                         description: 'Area created for analysis',
-                        geometry_geojson: geometry
+                        geometry_geojson: geometry  // Send the full Feature object
                     })
                 });
                 
@@ -626,6 +680,21 @@ class ForestMonitoringSystem {
                 colors: ['#8B0000', '#FF6347', '#FFA500', '#9ACD32', '#32CD32'],
                 name: 'OSAVI (Optimized Soil Adjusted Vegetation Index)',
                 description: 'Optimized soil-adjusted vegetation'
+            },
+            'NDRE': {
+                colors: ['#8B0000', '#FF4500', '#FFD700', '#32CD32', '#228B22'],
+                name: 'NDRE (Normalized Difference Red Edge)',
+                description: 'Red edge vegetation monitoring'
+            },
+            'CIRE': {
+                colors: ['#8B0000', '#FF6347', '#FFD700', '#9ACD32', '#32CD32'],
+                name: 'CIRE (Chlorophyll Index Red Edge)',
+                description: 'Chlorophyll content monitoring'
+            },
+            'LAI': {
+                colors: ['#FFFFFF', '#FFE4B5', '#9ACD32', '#228B22', '#006400'],
+                name: 'LAI (Leaf Area Index)',
+                description: 'Leaf area density'
             }
         };
         
@@ -644,8 +713,14 @@ class ForestMonitoringSystem {
                 description: 'Vegetation index'
             };
             
-            // Calculate color based on vegetation value (0-1 range)
-            const normalizedValue = Math.max(0, Math.min(1, latestData.mean_value));
+            // Calculate color based on vegetation value
+            // LAI has a different range (0-6), normalize accordingly
+            let normalizedValue;
+            if (indexName === 'LAI') {
+                normalizedValue = Math.max(0, Math.min(1, latestData.mean_value / 6.0));
+            } else {
+                normalizedValue = Math.max(0, Math.min(1, latestData.mean_value));
+            }
             const color = this.interpolateColor(colorScheme.colors, normalizedValue);
             
             // Create a layer group for this vegetation index
@@ -859,7 +934,7 @@ class ForestMonitoringSystem {
     }
     
     getVegetationCategory(value, indexName) {
-        if (indexName === 'NDVI' || indexName === 'EVI' || indexName === 'SAVI' || indexName === 'GNDVI' || indexName === 'OSAVI') {
+        if (indexName === 'NDVI' || indexName === 'EVI' || indexName === 'SAVI' || indexName === 'GNDVI' || indexName === 'OSAVI' || indexName === 'NDRE' || indexName === 'CIRE') {
             if (value < 0.2) return 'Bare soil/Water';
             if (value < 0.4) return 'Sparse vegetation';
             if (value < 0.6) return 'Moderate vegetation';
@@ -876,6 +951,12 @@ class ForestMonitoringSystem {
             if (value < 0.44) return 'Low burn severity';
             if (value < 0.66) return 'Unburned';
             return 'Enhanced regrowth';
+        } else if (indexName === 'LAI') {
+            if (value < 1.0) return 'Very sparse canopy';
+            if (value < 2.0) return 'Sparse canopy';
+            if (value < 3.0) return 'Moderate canopy';
+            if (value < 4.0) return 'Dense canopy';
+            return 'Very dense canopy';
         }
         return 'Vegetation index';
     }
