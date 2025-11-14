@@ -56,6 +56,24 @@ class Command(BaseCommand):
                 'full_name': 'Optimized Soil Adjusted Vegetation Index',
                 'description': 'Optimized version of SAVI with fixed soil adjustment factor.',
                 'formula': 'OSAVI = (NIR - Red) / (NIR + Red + 0.16) * 1.16'
+            },
+            {
+                'name': 'NDRE',
+                'full_name': 'Normalized Difference Red Edge',
+                'description': 'Uses red edge band (B5) to assess chlorophyll content and vegetation stress. More sensitive to early stress detection than NDVI.',
+                'formula': 'NDRE = (NIR - Red Edge) / (NIR + Red Edge)'
+            },
+            {
+                'name': 'CIRE',
+                'full_name': 'Chlorophyll Index Red Edge',
+                'description': 'Measures chlorophyll content using red edge band. Higher values indicate more chlorophyll.',
+                'formula': 'CIRE = (NIR / Red Edge) - 1'
+            },
+            {
+                'name': 'LAI',
+                'full_name': 'Leaf Area Index',
+                'description': 'Measures the total leaf area per unit ground area. Values typically range from 0 (bare ground) to 6+ (dense canopy).',
+                'formula': 'LAI = 3.618 * NDVI - 0.118 (simplified empirical relationship)'
             }
         ]
         
