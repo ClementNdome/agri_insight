@@ -18,7 +18,19 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Get allowed hosts from environment or default
+allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
+
+# For leapcell.io deployment, allow leapcell.dev subdomains
+if os.getenv('LEAPCELL_DEPLOYMENT') == 'true' or os.getenv('PORT'):
+    # In production/deployment, allow all hosts if needed (leapcell handles routing)
+    # Or add specific domains from environment
+    leapcell_domain = os.getenv('LEAPCELL_DOMAIN') or os.getenv('HOST')
+    if leapcell_domain:
+        ALLOWED_HOSTS.append(leapcell_domain)
+    # Allow all hosts in deployment (leapcell gateway handles security)
+    # Uncomment if needed: ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -113,6 +125,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+# Static files storage for production
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -129,8 +145,18 @@ LOGIN_REDIRECT_URL = '/landing/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # GeoDjango settings
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', 'C:/OSGeo4W64/bin/gdal310.dll')
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', 'C:/OSGeo4W/bin/geos_c.dll')
+# Default to Linux paths (for production deployment)
+# Windows paths are used only if explicitly set
+default_gdal = os.getenv('GDAL_LIBRARY_PATH') or '/usr/lib/x86_64-linux-gnu/libgdal.so'
+default_geos = os.getenv('GEOS_LIBRARY_PATH') or '/usr/lib/x86_64-linux-gnu/libgeos_c.so'
+
+# Use Windows paths only if on Windows and not in deployment
+if os.name == 'nt' and not os.getenv('PORT'):
+    default_gdal = 'C:/OSGeo4W64/bin/gdal310.dll'
+    default_geos = 'C:/OSGeo4W/bin/geos_c.dll'
+
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', default_gdal)
+GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', default_geos)
 
 # Google Earth Engine settings
 GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = os.getenv('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH')

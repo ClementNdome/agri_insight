@@ -282,6 +282,17 @@ python manage.py flush
 
 ## Deployment
 
+### Leapcell.io Deployment
+
+For deploying to Leapcell.io, see the comprehensive guide in [LEAPCELL_DEPLOYMENT.md](LEAPCELL_DEPLOYMENT.md).
+
+Quick start:
+1. Connect your repository to Leapcell.io
+2. Set build command: `pip install -r requirements.txt && python manage.py collectstatic --noinput`
+3. Set start command: `gunicorn forest_monitoring.wsgi:application --bind 0.0.0.0:$PORT --workers 2`
+4. Configure environment variables (see LEAPCELL_DEPLOYMENT.md)
+5. Deploy!
+
 ### Production Settings
 
 1. **Set DEBUG=False**

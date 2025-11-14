@@ -1,0 +1,47 @@
+# Leapcell.io deployment configuration
+# https://docs.leapcell.io
+
+# Build configuration
+build:
+  # Build command - install dependencies
+  command: pip install --upgrade pip && pip install -r requirements.txt
+  
+  # Build context (optional)
+  # context: .
+
+# Runtime configuration
+runtime:
+  # Python version
+  python_version: "3.11"
+  
+  # Port to listen on (leapcell will set PORT environment variable)
+  port: ${PORT}
+  
+  # Start command
+  start: gunicorn forest_monitoring.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --threads 2 --timeout 120 --access-logfile - --error-logfile -
+
+# Health check (optional)
+healthcheck:
+  path: /
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Environment variables
+# These should be set in the Leapcell dashboard, not here
+# Required variables:
+# - SECRET_KEY
+# - DEBUG (set to False for production)
+# - ALLOWED_HOSTS (comma-separated list)
+# - DATABASE_URL or DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+# - GDAL_LIBRARY_PATH (for Linux: /usr/lib/x86_64-linux-gnu/libgdal.so)
+# - GEOS_LIBRARY_PATH (for Linux: /usr/lib/x86_64-linux-gnu/libgeos_c.so)
+# Optional:
+# - REDIS_URL (for Celery)
+# - GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH
+# - GOOGLE_EARTH_ENGINE_PROJECT
+
+# Build hooks (optional)
+hooks:
+  postbuild: python manage.py collectstatic --noinput
+
