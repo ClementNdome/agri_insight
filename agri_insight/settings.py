@@ -141,13 +141,13 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/landing/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# GeoDjango settings - Only set library paths if needed
-if os.name == 'nt':  # Windows
-    GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='C:/OSGeo4W/bin/gdal310.dll')
-    GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='C:/OSGeo4W/bin/geos_c.dll')
-else:  # Linux/Production
-    GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='/usr/lib/x86_64-linux-gnu/libgdal.so')
-    GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='/usr/lib/x86_64-linux-gnu/libgeos_c.so')
+# # GeoDjango settings - Only set library paths if needed
+# if os.name == 'nt':  # Windows
+#     GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='C:/OSGeo4W/bin/gdal310.dll')
+#     GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='C:/OSGeo4W/bin/geos_c.dll')
+# else:  # Linux/Production
+#     GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='/usr/lib/x86_64-linux-gnu/libgdal.so')
+#     GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='/usr/lib/x86_64-linux-gnu/libgeos_c.so')
 
 # Google Earth Engine settings
 GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = config('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH', default=None)
