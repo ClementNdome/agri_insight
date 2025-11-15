@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Welcome - Agri Insight{% endblock %}
+{% block title %}Agri Insight - Smart Agricultural Monitoring System{% endblock %}
 
 {% block extra_css %}
 <style>
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
         color: white;
-        padding: 5rem 0;
-        margin-bottom: 3rem;
+        padding: 6rem 0 4rem;
         position: relative;
         overflow: hidden;
     }
+    
     .hero-section::before {
         content: '';
         position: absolute;
@@ -23,83 +24,257 @@
         background-size: cover;
         opacity: 0.3;
     }
+    
     .hero-content {
         position: relative;
         z-index: 1;
     }
+    
+    .hero-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+    
     .feature-card {
         background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
         height: 100%;
-        border: none;
-    }
-    .feature-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-    .feature-icon {
-        font-size: 3rem;
-        color: #667eea;
-        margin-bottom: 1rem;
-    }
-    .stat-card {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        transition: transform 0.3s;
-        height: 100%;
+        border: 1px solid #f0f0f0;
         text-align: center;
     }
+    
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(46, 139, 87, 0.15);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1);
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        transition: transform 0.3s ease;
+        height: 100%;
+        text-align: center;
+        border: 1px solid #f0f0f0;
+    }
+    
     .stat-card:hover {
         transform: translateY(-5px);
     }
+    
     .stat-icon {
         font-size: 2.5rem;
-        color: #667eea;
+        color: #2E8B57;
+        margin-bottom: 1rem;
     }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2E8B57;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
     .tip-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 1.5rem;
         margin: 0.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        border: 1px solid #f0f0f0;
+        transition: transform 0.3s ease;
     }
+    
+    .tip-card:hover {
+        transform: translateY(-3px);
+    }
+    
     .alert-item {
         background: white;
         border-left: 4px solid #dc3545;
-        padding: 1rem;
-        margin-bottom: 0.5rem;
-        border-radius: 5px;
+        padding: 1.25rem;
+        margin-bottom: 0.75rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: transform 0.2s ease;
     }
+    
+    .alert-item:hover {
+        transform: translateX(4px);
+    }
+    
     .alert-item.medium {
         border-left-color: #ffc107;
     }
+    
     .alert-item.low {
         border-left-color: #28a745;
     }
+    
     .cta-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
         color: white;
         padding: 4rem 0;
         margin-top: 4rem;
-        border-radius: 15px;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+    }
+    
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }
+    
     .btn-cta {
         background: white;
-        color: #667eea;
-        padding: 0.75rem 2rem;
-        font-weight: bold;
-        border-radius: 50px;
-        transition: all 0.3s;
+        color: #2E8B57;
+        padding: 1rem 2.5rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        font-size: 1.1rem;
     }
+    
     .btn-cta:hover {
-        background: #f8f9fa;
-        transform: scale(1.05);
-        color: #667eea;
+        background: transparent;
+        color: white;
+        border-color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-light:hover {
+        background: white;
+        color: #2E8B57;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #6c757d;
+        text-align: center;
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .feature-card {
+            padding: 2rem 1.5rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-section {
+            padding: 4rem 0 3rem;
+        }
+        
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+        }
+        
+        .btn-cta {
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 1.75rem;
+        }
     }
 </style>
 {% endblock %}
@@ -109,96 +284,129 @@
 <!-- Authenticated User Dashboard -->
 <div class="hero-section">
     <div class="container hero-content">
-        <h1 class="display-4 mb-3">Welcome back, {{ user.first_name|default:user.username }}! 👋</h1>
-        <p class="lead">Monitor your farms and optimize your agricultural operations</p>
+        <div class="hero-badge">
+            <i class="fas fa-rocket me-2"></i>Welcome to Your Farm Dashboard
+        </div>
+        <h1 class="hero-title">Hello, {{ user.first_name|default:user.username }}! 👋</h1>
+        <p class="hero-subtitle">Monitor your farms and optimize your agricultural operations with real-time satellite data</p>
     </div>
 </div>
 
 <div class="container">
     <!-- Quick Stats -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
+    <div class="row mb-5">
+        <div class="col-md-3 col-6 mb-4">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="bi bi-geo-alt"></i>
+                    <i class="fas fa-map-marked-alt"></i>
                 </div>
-                <h3>{{ area_count }}</h3>
-                <p class="text-muted">Active Farms</p>
+                <div class="stat-number">{{ area_count }}</div>
+                <p class="text-muted mb-0">Active Farms</p>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
+        <div class="col-md-3 col-6 mb-4">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="bi bi-graph-up"></i>
+                    <i class="fas fa-chart-line"></i>
                 </div>
-                <h3>{{ monitoring_data_count }}</h3>
-                <p class="text-muted">Monitoring Records</p>
+                <div class="stat-number">{{ monitoring_data_count }}</div>
+                <p class="text-muted mb-0">Monitoring Records</p>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
+        <div class="col-md-3 col-6 mb-4">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="bi bi-bell"></i>
+                    <i class="fas fa-bell"></i>
                 </div>
-                <h3>{{ alert_count }}</h3>
-                <p class="text-muted">Active Alerts</p>
+                <div class="stat-number">{{ alert_count }}</div>
+                <p class="text-muted mb-0">Active Alerts</p>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
+        <div class="col-md-3 col-6 mb-4">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="bi bi-check-circle"></i>
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <h3>{{ areas|length }}</h3>
-                <p class="text-muted">Areas Monitored</p>
+                <div class="stat-number">{{ areas|length }}</div>
+                <p class="text-muted mb-0">Areas Monitored</p>
             </div>
         </div>
     </div>
 
     <div class="row">
         <!-- Recent Alerts -->
-        <div class="col-md-6 mb-4">
+        <div class="col-lg-6 mb-4">
             <div class="card">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0"><i class="bi bi-bell"></i> Recent Alerts</h5>
+                <div class="card-header bg-white border-bottom-0 pb-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-bell text-danger me-2"></i>
+                        Recent Alerts
+                    </h5>
                 </div>
                 <div class="card-body">
                     {% if recent_alerts %}
                         {% for alert in recent_alerts %}
                             <div class="alert-item {{ alert.severity|lower }}">
-                                <strong>{{ alert.area_of_interest.name }}</strong> - {{ alert.vegetation_index.name }}
-                                <br>
-                                <small>{{ alert.message }}</small>
-                                <br>
-                                <small class="text-muted">{{ alert.created_at|date:"M d, Y H:i" }}</small>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong class="text-dark">{{ alert.area_of_interest.name }}</strong>
+                                    <span class="badge bg-{% if alert.severity == 'HIGH' %}danger{% elif alert.severity == 'MEDIUM' %}warning{% else %}success{% endif %}">
+                                        {{ alert.severity }}
+                                    </span>
+                                </div>
+                                <p class="mb-2 text-muted">{{ alert.message }}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>{{ alert.created_at|date:"M d, Y H:i" }}
+                                </small>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p class="text-muted text-center">No active alerts. Great job! 🎉</p>
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                            <p class="text-muted mb-0">No active alerts. Great job! 🎉</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Getting Started Guide -->
-        <div class="col-md-6 mb-4">
+        <!-- Quick Actions -->
+        <div class="col-lg-6 mb-4">
             <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Quick Actions</h5>
+                <div class="card-header bg-white border-bottom-0 pb-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        Quick Actions
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <div class="list-group">
-                        <a href="{% url 'home' %}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-map"></i> Draw your first farm area on the map
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'home' %}" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                            <i class="fas fa-draw-polygon text-primary me-3 fa-lg"></i>
+                            <div>
+                                <h6 class="mb-1">Draw Farm Area</h6>
+                                <p class="mb-0 text-muted small">Create a new monitoring area on the map</p>
+                            </div>
                         </a>
-                        <a href="{% url 'home' %}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-graph-up"></i> Select vegetation indices to monitor
+                        <a href="{% url 'home' %}" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                            <i class="fas fa-seedling text-success me-3 fa-lg"></i>
+                            <div>
+                                <h6 class="mb-1">Monitor Vegetation</h6>
+                                <p class="mb-0 text-muted small">Analyze crop health with vegetation indices</p>
+                            </div>
                         </a>
-                        <a href="{% url 'home' %}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-calculator"></i> Calculate monitoring data
+                        <a href="{% url 'home' %}" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                            <i class="fas fa-chart-bar text-info me-3 fa-lg"></i>
+                            <div>
+                                <h6 class="mb-1">View Analytics</h6>
+                                <p class="mb-0 text-muted small">Check historical data and trends</p>
+                            </div>
                         </a>
-                        <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-gear"></i> Configure monitoring settings
+                        <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                            <i class="fas fa-cog text-secondary me-3 fa-lg"></i>
+                            <div>
+                                <h6 class="mb-1">Settings</h6>
+                                <p class="mb-0 text-muted small">Configure monitoring preferences</p>
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -208,11 +416,14 @@
 
     <!-- Educational Tips Carousel -->
     {% if tips %}
-    <div class="row mb-4">
+    <div class="row mb-5">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-book"></i> Sustainable Farming Tips</h5>
+                <div class="card-header bg-white border-bottom-0 pb-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-lightbulb text-success me-2"></i>
+                        Sustainable Farming Tips
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div id="tipsCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -220,20 +431,25 @@
                             {% for tip in tips %}
                                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                     <div class="tip-card">
-                                        <h5>{{ tip.title }}</h5>
-                                        <p>{{ tip.content }}</p>
-                                        <small class="text-muted">
-                                            <i class="bi bi-tag"></i> {{ tip.get_category_display }}
-                                        </small>
+                                        <h5 class="text-primary">{{ tip.title }}</h5>
+                                        <p class="text-muted">{{ tip.content }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-tag me-1"></i> {{ tip.get_category_display }}
+                                            </small>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-leaf me-1"></i>Tip
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#tipsCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
+                            <span class="carousel-control-prev-icon bg-primary rounded-circle p-2"></span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#tipsCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
+                            <span class="carousel-control-next-icon bg-primary rounded-circle p-2"></span>
                         </button>
                     </div>
                 </div>
@@ -247,15 +463,18 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Your Farm Areas</h5>
+                <div class="card-header bg-white border-bottom-0 pb-3">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="fas fa-list-alt text-info me-2"></i>
+                        Your Farm Areas
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Farm Name</th>
                                     <th>Crop Type</th>
                                     <th>Area (ha)</th>
                                     <th>Status</th>
@@ -265,7 +484,12 @@
                             <tbody>
                                 {% for area in areas|slice:":5" %}
                                     <tr>
-                                        <td>{{ area.name }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                                {{ area.name }}
+                                            </div>
+                                        </td>
                                         <td>{{ area.get_crop_type_display|default:"Not specified" }}</td>
                                         <td>{{ area.area_hectares|floatformat:2|default:"N/A" }}</td>
                                         <td>
@@ -276,15 +500,19 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{% url 'home' %}" class="btn btn-sm btn-primary">View</a>
+                                            <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
                                         </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-center mt-3">
-                        <a href="{% url 'home' %}" class="btn btn-primary">Go to Dashboard</a>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-primary px-4">
+                            <i class="fas fa-map me-2"></i>Go to Map Dashboard
+                        </a>
                     </div>
                 </div>
             </div>
@@ -297,139 +525,177 @@
 <!-- Non-Authenticated User Landing Page -->
 <div class="hero-section">
     <div class="container hero-content text-center">
-        <h1 class="display-3 mb-4"><i class="fas fa-seedling"></i> Agri Insight</h1>
-        <p class="lead mb-4">Advanced Agricultural Monitoring System powered by Google Earth Engine</p>
-        <p class="mb-4">Monitor your farms, track vegetation health, and make data-driven decisions</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg px-4">
-                <i class="fas fa-user-plus"></i> Get Started
+        <div class="hero-badge">
+            <i class="fas fa-star me-2"></i>Trusted by Farmers Worldwide
+        </div>
+        <h1 class="hero-title">Transform Your Farming with <span class="text-warning">Satellite Intelligence</span></h1>
+        <p class="hero-subtitle">Monitor crop health, optimize resources, and increase yields with AI-powered agricultural insights</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
+            <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg px-4 py-3">
+                <i class="fas fa-rocket me-2"></i>Start Free Trial
             </a>
-            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
-                <i class="fas fa-sign-in-alt"></i> Login
+            <a href="{% url 'demo' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                <i class="fas fa-play-circle me-2"></i>View Live Demo
             </a>
-            <a href="{% url 'demo' %}" class="btn btn-outline-light btn-lg px-4">
-                <i class="fas fa-eye"></i> View Demo
-            </a>
+        </div>
+        <div class="mt-4">
+            <small class="text-white-50">
+                <i class="fas fa-shield-alt me-1"></i>No credit card required • Free 14-day trial
+            </small>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <!-- Features Section -->
+<!-- Features Section -->
+<div class="container py-5" id="features">
     <div class="row mb-5">
-        <div class="col-12 text-center mb-5">
-            <h2 class="display-5 mb-3">Why Choose Agri Insight?</h2>
-            <p class="lead text-muted">Powerful features to help you optimize your agricultural operations</p>
+        <div class="col-12 text-center">
+            <h2 class="section-title">Why Farmers Choose Agri Insight</h2>
+            <p class="section-subtitle">Powerful features designed to optimize your agricultural operations and maximize yields</p>
         </div>
-        
-        <div class="col-md-4 mb-4">
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="feature-icon text-center">
-                    <i class="fas fa-satellite"></i>
+                <div class="feature-icon">
+                    <i class="fas fa-satellite-dish"></i>
                 </div>
-                <h4 class="text-center mb-3">Satellite Monitoring</h4>
-                <p class="text-center text-muted">Real-time satellite imagery from Google Earth Engine to monitor your fields 24/7</p>
+                <h4 class="text-center mb-3">Real-time Satellite Monitoring</h4>
+                <p class="text-center text-muted">Access high-resolution satellite imagery from multiple sources to monitor your fields 24/7 with automatic updates.</p>
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="feature-icon text-center">
+                <div class="feature-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <h4 class="text-center mb-3">Vegetation Analysis</h4>
-                <p class="text-center text-muted">Track NDVI, EVI, SAVI and other vegetation indices to assess crop health</p>
+                <h4 class="text-center mb-3">Advanced Vegetation Analysis</h4>
+                <p class="text-center text-muted">Track NDVI, EVI, SAVI and other vegetation indices with precision to assess crop health and growth stages.</p>
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="feature-icon text-center">
+                <div class="feature-icon">
                     <i class="fas fa-bell"></i>
                 </div>
-                <h4 class="text-center mb-3">Smart Alerts</h4>
-                <p class="text-center text-muted">Get notified about critical changes in your fields automatically</p>
+                <h4 class="text-center mb-3">Smart Alert System</h4>
+                <p class="text-center text-muted">Get instant notifications about critical changes in vegetation health, moisture levels, and potential issues.</p>
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="feature-icon text-center">
+                <div class="feature-icon">
                     <i class="fas fa-map-marked-alt"></i>
                 </div>
-                <h4 class="text-center mb-3">Area Management</h4>
-                <p class="text-center text-muted">Draw and manage multiple farm areas with ease</p>
+                <h4 class="text-center mb-3">Precision Area Management</h4>
+                <p class="text-center text-muted">Draw and manage multiple farm areas with ease, track boundaries, and monitor specific zones independently.</p>
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="feature-icon text-center">
+                <div class="feature-icon">
                     <i class="fas fa-history"></i>
                 </div>
-                <h4 class="text-center mb-3">Historical Data</h4>
-                <p class="text-center text-muted">Access historical monitoring data to track trends over time</p>
+                <h4 class="text-center mb-3">Historical Data & Trends</h4>
+                <p class="text-center text-muted">Access comprehensive historical data to track performance trends, compare seasons, and make data-driven decisions.</p>
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="feature-icon text-center">
+                <div class="feature-icon">
                     <i class="fas fa-mobile-alt"></i>
                 </div>
-                <h4 class="text-center mb-3">Mobile Friendly</h4>
-                <p class="text-center text-muted">Access your farm data from anywhere, on any device</p>
+                <h4 class="text-center mb-3">Mobile-First Design</h4>
+                <p class="text-center text-muted">Access your farm data from anywhere, on any device with our responsive design optimized for field use.</p>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Educational Tips -->
-    {% if tips %}
+<!-- Stats Section -->
+<div class="bg-light py-5 my-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-3 col-6 mb-4">
+                <div class="stat-number text-primary">500+</div>
+                <p class="text-muted">Active Farms</p>
+            </div>
+            <div class="col-lg-3 col-6 mb-4">
+                <div class="stat-number text-primary">10K+</div>
+                <p class="text-muted">Monitoring Sessions</p>
+            </div>
+            <div class="col-lg-3 col-6 mb-4">
+                <div class="stat-number text-primary">95%</div>
+                <p class="text-muted">Accuracy Rate</p>
+            </div>
+            <div class="col-lg-3 col-6 mb-4">
+                <div class="stat-number text-primary">24/7</div>
+                <p class="text-muted">Satellite Coverage</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Educational Tips -->
+{% if tips %}
+<div class="container py-5">
     <div class="row mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-book"></i> Sustainable Farming Tips</h5>
-                </div>
-                <div class="card-body">
-                    <div id="tipsCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            {% for tip in tips|slice:":5" %}
-                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                    <div class="tip-card">
-                                        <h5>{{ tip.title }}</h5>
-                                        <p>{{ tip.content }}</p>
-                                        <small class="text-muted">
-                                            <i class="bi bi-tag"></i> {{ tip.get_category_display }}
-                                        </small>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#tipsCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#tipsCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
+        <div class="col-12 text-center">
+            <h2 class="section-title">Sustainable Farming Insights</h2>
+            <p class="section-subtitle">Expert tips and best practices to enhance your farming operations</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        {% for tip in tips|slice:":3" %}
+        <div class="col-lg-4 col-md-6">
+            <div class="tip-card h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="feature-icon" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-leaf"></i>
                     </div>
+                    <h5 class="ms-3 mb-0 text-primary">{{ tip.title }}</h5>
+                </div>
+                <p class="text-muted">{{ tip.content|truncatewords:30 }}</p>
+                <div class="mt-auto">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-tag me-1"></i>{{ tip.get_category_display }}
+                    </span>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endif %}
+</div>
+{% endif %}
 
-    <!-- CTA Section -->
-    <div class="cta-section text-center">
-        <h2 class="mb-3">Ready to Get Started?</h2>
-        <p class="lead mb-4">Join thousands of farmers using Agri Insight to optimize their operations</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{% url 'accounts:signup' %}" class="btn btn-cta btn-lg">
-                <i class="fas fa-user-plus"></i> Create Free Account
-            </a>
-            <a href="{% url 'demo' %}" class="btn btn-outline-light btn-lg">
-                <i class="fas fa-eye"></i> View Demo First
-            </a>
+<!-- CTA Section -->
+<div class="container py-5">
+    <div class="cta-section">
+        <div class="cta-content text-center">
+            <h2 class="display-5 mb-3">Ready to Revolutionize Your Farming?</h2>
+            <p class="lead mb-4">Join thousands of forward-thinking farmers using Agri Insight to make data-driven decisions</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'accounts:signup' %}" class="btn btn-cta">
+                    <i class="fas fa-user-plus me-2"></i>Start Free Trial
+                </a>
+                <a href="{% url 'demo' %}" class="btn btn-outline-light">
+                    <i class="fas fa-eye me-2"></i>See Demo First
+                </a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light">
+                    <i class="fas fa-sign-in-alt me-2"></i>Existing Account
+                </a>
+            </div>
+            <div class="mt-4">
+                <small class="text-white-50">
+                    <i class="fas fa-check-circle me-1"></i>No setup fees • Cancel anytime • Full support included
+                </small>
+            </div>
         </div>
     </div>
 </div>
