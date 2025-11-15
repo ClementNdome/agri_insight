@@ -201,49 +201,65 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Logging configuration
-logs_dir = BASE_DIR / 'logs'
-logs_dir.mkdir(exist_ok=True)
-
+# Logging configuration - Console only for production (fixes read-only file system issue)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': logs_dir / 'django.log',
-            'formatter': 'verbose',
-        },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'monitoring': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },
 }
+
+# Only add file logging in development if directory is writable
+if DEBUG:
+    try:
+        logs_dir = BASE_DIR / 'logs'
+        logs_dir.mkdir(exist_ok=True)
+        # Test if we can write to the directory
+        test_file = logs_dir / 'test_write.log'
+        with open(test_file, 'w') as f:
+            f.write('test')
+        os.remove(test_file)
+        
+        # Add file handler if writable
+        LOGGING['handlers']['file'] = {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': logs_dir / 'django.log',
+            'formatter': 'verbose',
+        }
+        LOGGING['root']['handlers'].append('file')
+        LOGGING['loggers']['django']['handlers'].append('file')
+        LOGGING['loggers']['monitoring']['handlers'].append('file')
+    except (OSError, PermissionError):
+        # If we can't write to files, just use console logging
+        print("Warning: Cannot write to logs directory. Using console logging only.")
 
 # Jazzmin Admin Configuration
 JAZZMIN_SETTINGS = {
