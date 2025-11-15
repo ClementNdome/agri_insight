@@ -1,135 +1,369 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Demo - Agri Insight{% endblock %}
+{% block title %}Live Demo - Agri Insight{% endblock %}
 
 {% block extra_css %}
 <style>
     .demo-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
         color: white;
-        padding: 4rem 0;
-        margin-bottom: 3rem;
+        padding: 5rem 0 4rem;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .demo-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+    }
+    
+    .demo-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .demo-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+    
     .demo-card {
         background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         margin-bottom: 2rem;
+        border: 1px solid #f0f0f0;
+        transition: transform 0.3s ease;
     }
+    
+    .demo-card:hover {
+        transform: translateY(-5px);
+    }
+    
     .demo-map-container {
         height: 400px;
-        background: #f8f9fa;
-        border-radius: 10px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px dashed #667eea;
+        border: 3px dashed #2E8B57;
         margin: 2rem 0;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .demo-map-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(46, 139, 87, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 2rem;
+    }
+    
     .demo-feature {
         padding: 1.5rem;
-        border-left: 4px solid #667eea;
-        background: #f8f9fa;
+        border-left: 4px solid #2E8B57;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         margin-bottom: 1rem;
-        border-radius: 5px;
+        border-radius: 8px;
+        transition: transform 0.2s ease;
     }
+    
+    .demo-feature:hover {
+        transform: translateX(5px);
+    }
+    
     .demo-cta {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
         color: white;
-        padding: 3rem;
-        border-radius: 15px;
+        padding: 4rem 2rem;
+        border-radius: 20px;
         text-align: center;
         margin-top: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .demo-cta::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+    }
+    
+    .demo-cta-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .feature-item {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(46, 139, 87, 0.1);
+    }
+    
+    .feature-icon-sm {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-demo {
+        background: white;
+        color: #2E8B57;
+        padding: 1rem 2.5rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        font-size: 1.1rem;
+    }
+    
+    .btn-demo:hover {
+        background: transparent;
+        color: white;
+        border-color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .demo-hero {
+            padding: 4rem 0 3rem;
+        }
+        
+        .demo-card {
+            padding: 2rem 1.5rem;
+        }
+        
+        .demo-map-container {
+            height: 300px;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .demo-hero {
+            padding: 3rem 0 2rem;
+        }
+        
+        .demo-card {
+            padding: 1.5rem 1rem;
+        }
+        
+        .demo-map-container {
+            height: 250px;
+        }
+        
+        .demo-cta {
+            padding: 3rem 1.5rem;
+        }
+        
+        .btn-demo {
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="demo-hero">
-    <div class="container text-center">
-        <h1 class="display-4 mb-3"><i class="fas fa-eye"></i> Demo Preview</h1>
-        <p class="lead">Get a glimpse of what Agri Insight can do for your farm</p>
+    <div class="container demo-hero-content text-center">
+        <div class="demo-badge">
+            <i class="fas fa-eye me-2"></i>Interactive Demo Preview
+        </div>
+        <h1 class="display-4 mb-3 fw-bold">See Agri Insight in Action</h1>
+        <p class="lead mb-4">Experience how satellite monitoring can transform your farming operations</p>
     </div>
 </div>
 
 <div class="container">
-    <div class="demo-card">
-        <h3 class="mb-4"><i class="fas fa-info-circle text-primary"></i> What You'll See</h3>
-        <p class="lead">This is a limited preview of Agri Insight's capabilities. To access the full features, please sign up for a free account.</p>
-    </div>
-
-    <!-- Map Preview -->
-    <div class="demo-card">
-        <h4 class="mb-3"><i class="fas fa-map-marked-alt text-primary"></i> Interactive Map</h4>
-        <div class="demo-map-container">
-            <div class="text-center">
-                <i class="fas fa-map fa-4x text-muted mb-3"></i>
-                <p class="text-muted">Interactive map with satellite imagery</p>
-                <p class="small text-muted">Draw areas, analyze vegetation, and monitor your farms</p>
-            </div>
+    <!-- Demo Overview -->
+    <div class="demo-card text-center">
+        <div class="feature-icon-sm mx-auto">
+            <i class="fas fa-info-circle"></i>
         </div>
-        <p class="text-muted mt-3">With Agri Insight, you can:</p>
-        <ul class="list-unstyled">
-            <li class="demo-feature">
-                <i class="fas fa-check-circle text-success"></i> Draw custom farm areas on the map
-            </li>
-            <li class="demo-feature">
-                <i class="fas fa-check-circle text-success"></i> Analyze vegetation indices (NDVI, EVI, SAVI, etc.)
-            </li>
-            <li class="demo-feature">
-                <i class="fas fa-check-circle text-success"></i> View real-time satellite imagery from Google Earth Engine
-            </li>
-            <li class="demo-feature">
-                <i class="fas fa-check-circle text-success"></i> Track historical data and trends
-            </li>
-        </ul>
-    </div>
-
-    <!-- Features Preview -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="demo-card">
-                <h5><i class="fas fa-chart-line text-primary"></i> Vegetation Monitoring</h5>
-                <p class="text-muted">Monitor crop health using advanced vegetation indices:</p>
-                <ul>
-                    <li>NDVI - Normalized Difference Vegetation Index</li>
-                    <li>EVI - Enhanced Vegetation Index</li>
-                    <li>SAVI - Soil Adjusted Vegetation Index</li>
-                    <li>NDMI - Normalized Difference Moisture Index</li>
-                    <li>And more...</li>
-                </ul>
+        <h3 class="mb-3 text-primary">What You'll Discover</h3>
+        <p class="lead text-muted mb-4">This interactive preview showcases Agri Insight's powerful features. Get hands-on experience with our monitoring tools before signing up.</p>
+        
+        <div class="demo-map-container">
+            <div class="demo-map-overlay">
+                <i class="fas fa-map-marked-alt fa-4x text-primary mb-3"></i>
+                <h4 class="text-primary mb-2">Interactive Farm Monitoring</h4>
+                <p class="text-muted text-center">Draw areas, analyze vegetation indices, and monitor crop health in real-time</p>
+                <div class="mt-3">
+                    <span class="badge bg-primary me-2">Satellite Imagery</span>
+                    <span class="badge bg-success me-2">NDVI Analysis</span>
+                    <span class="badge bg-info">Real-time Data</span>
+                </div>
             </div>
         </div>
         
-        <div class="col-md-6 mb-4">
-            <div class="demo-card">
-                <h5><i class="fas fa-bell text-primary"></i> Smart Alerts</h5>
-                <p class="text-muted">Get notified about important changes:</p>
-                <ul>
-                    <li>Vegetation health alerts</li>
-                    <li>Moisture level warnings</li>
-                    <li>Anomaly detection</li>
-                    <li>Customizable thresholds</li>
+        <p class="text-muted mt-3">With Agri Insight, you can:</p>
+        <div class="feature-grid">
+            <div class="demo-feature">
+                <i class="fas fa-draw-polygon text-success me-2"></i>
+                <strong>Draw Custom Farm Areas</strong> - Easily create and manage multiple farm boundaries
+            </div>
+            <div class="demo-feature">
+                <i class="fas fa-chart-line text-success me-2"></i>
+                <strong>Analyze Vegetation Health</strong> - Monitor NDVI, EVI, SAVI and other indices
+            </div>
+            <div class="demo-feature">
+                <i class="fas fa-satellite text-success me-2"></i>
+                <strong>Real-time Satellite Data</strong> - Access latest imagery from Google Earth Engine
+            </div>
+            <div class="demo-feature">
+                <i class="fas fa-history text-success me-2"></i>
+                <strong>Historical Trends</strong> - Track performance and compare seasonal data
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Preview -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="demo-card h-100">
+                <div class="feature-icon-sm">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h5 class="text-primary mb-3">Advanced Vegetation Monitoring</h5>
+                <p class="text-muted">Monitor crop health using multiple scientific indices:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>NDVI</strong> - Normalized Difference Vegetation Index
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>EVI</strong> - Enhanced Vegetation Index
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>SAVI</strong> - Soil Adjusted Vegetation Index
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>NDMI</strong> - Normalized Difference Moisture Index
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <strong>NBR</strong> - Normalized Burn Ratio
+                    </li>
                 </ul>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Each index provides unique insights into different aspects of crop health and soil conditions.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="demo-card h-100">
+                <div class="feature-icon-sm">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h5 class="text-primary mb-3">Smart Alert System</h5>
+                <p class="text-muted">Stay informed with intelligent notifications:</p>
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Vegetation Health Alert</strong> - Significant drop in NDVI detected in Field A
+                </div>
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-tint me-2"></i>
+                    <strong>Moisture Level Warning</strong> - Low soil moisture in northwest quadrant
+                </div>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Growth Milestone</strong> - Optimal vegetation health maintained for 30 days
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-sliders-h me-1"></i>
+                        Customize alert thresholds and notification preferences
+                    </small>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Tips Preview -->
     {% if tips %}
-    <div class="demo-card">
-        <h4 class="mb-3"><i class="fas fa-lightbulb text-primary"></i> Sustainable Farming Tips</h4>
-        <div class="row">
-            {% for tip in tips %}
-            <div class="col-md-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title">{{ tip.title }}</h6>
-                        <p class="card-text small">{{ tip.content|truncatewords:20 }}</p>
-                        <small class="text-muted">
-                            <i class="bi bi-tag"></i> {{ tip.get_category_display }}
-                        </small>
+    <div class="demo-card mt-4">
+        <div class="feature-icon-sm">
+            <i class="fas fa-lightbulb"></i>
+        </div>
+        <h5 class="text-primary mb-4">Sustainable Farming Insights</h5>
+        <div class="row g-4">
+            {% for tip in tips|slice:":3" %}
+            <div class="col-md-4">
+                <div class="feature-item h-100">
+                    <h6 class="text-primary">{{ tip.title }}</h6>
+                    <p class="text-muted small">{{ tip.content|truncatewords:20 }}</p>
+                    <div class="mt-auto">
+                        <span class="badge bg-light text-dark small">
+                            <i class="fas fa-tag me-1"></i>{{ tip.get_category_display }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -138,22 +372,28 @@
     </div>
     {% endif %}
 
-    <!-- CTA -->
+    <!-- Final CTA -->
     <div class="demo-cta">
-        <h2 class="mb-3">Ready to Experience the Full Power?</h2>
-        <p class="lead mb-4">Sign up now to access all features and start monitoring your farms today!</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg px-4">
-                <i class="fas fa-user-plus"></i> Sign Up Free
-            </a>
-            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            <a href="{% url 'landing' %}" class="btn btn-outline-light btn-lg px-4">
-                <i class="fas fa-home"></i> Back to Home
-            </a>
+        <div class="demo-cta-content">
+            <h2 class="display-5 mb-3">Ready to Experience the Full Power?</h2>
+            <p class="lead mb-4">Sign up now to access all features and start monitoring your farms with satellite precision!</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'accounts:signup' %}" class="btn btn-demo">
+                    <i class="fas fa-rocket me-2"></i>Start Free Trial
+                </a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light">
+                    <i class="fas fa-sign-in-alt me-2"></i>Existing Account
+                </a>
+                <a href="{% url 'landing' %}" class="btn btn-outline-light">
+                    <i class="fas fa-home me-2"></i>Back to Home
+                </a>
+            </div>
+            <div class="mt-4">
+                <small class="text-white-50">
+                    <i class="fas fa-gift me-1"></i>Free 14-day trial • No credit card required • Full feature access
+                </small>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
-
