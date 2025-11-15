@@ -1,0 +1,17 @@
+[build]
+command = "pip install -r requirement.txt"
+
+[run]
+command = "python manage.py collectstatic --noinput && gunicorn agri_insight.wsgi:application"
+
+[env]
+DEBUG = "False"
+LEAPCELL_DEPLOYMENT = "true"
+
+[[services]]
+name = "postgres"
+plan = "professional"
+
+[[services]]
+name = "redis"
+plan = "professional"
