@@ -5,6 +5,7 @@ Django settings for agri_insight project.
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from decouple import config
 import dj_database_url
 
 # Load environment variables
@@ -14,20 +15,24 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
+SECRET_KEY = config('SECRET_KEY', 'django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = True
 
 # Update ALLOWED_HOSTS section - REPLACE the existing section with:
-allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
+ALLOWED_HOSTS= ("*")
 
-# For deployment environments (e.g., leapcell.io), add dynamic hosts
-if os.getenv('LEAPCELL_DEPLOYMENT') == 'true' or os.getenv('PORT'):
-    leapcell_domain = os.getenv('LEAPCELL_DOMAIN') or os.getenv('HOST')
-    if leapcell_domain:
-        ALLOWED_HOSTS.append(leapcell_domain)
+#TURNED OFF IN PRODUCTION
+#  GeoDjango settings
+# GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgdal.so')
+# GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgeos_c.so')
+
+# # Override for Windows development
+# if os.name == 'nt' and not config('PORT'):
+#     GDAL_LIBRARY_PATH = 'C:/OSGeo4W/bin/gdal310.dll'
+#     GEOS_LIBRARY_PATH = 'C:/OSGeo4W/bin/geos_c.dll'
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -76,15 +81,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'agri_insight.wsgi.application'
 
 # Database - PostgreSQL with PostGIS
-DB_NAME = os.getenv('DB_NAME')
+DB_NAME = config('DB_NAME')
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': DB_NAME,
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
         'OPTIONS': {'sslmode': 'require'},
         'CONN_MAX_AGE': 600,
     }
@@ -136,18 +141,10 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/landing/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# GeoDjango settings
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgdal.so')
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgeos_c.so')
-
-# Override for Windows development
-if os.name == 'nt' and not os.getenv('PORT'):
-    GDAL_LIBRARY_PATH = 'C:/OSGeo4W/bin/gdal310.dll'
-    GEOS_LIBRARY_PATH = 'C:/OSGeo4W/bin/geos_c.dll'
 
 # Google Earth Engine settings
-GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = os.getenv('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH')
-GOOGLE_EARTH_ENGINE_PROJECT = os.getenv('GOOGLE_EARTH_ENGINE_PROJECT')
+GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = config('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH')
+GOOGLE_EARTH_ENGINE_PROJECT = config('GOOGLE_EARTH_ENGINE_PROJECT')
 
 # REST Framework settings
 REST_FRAMEWORK = {
@@ -190,8 +187,8 @@ LEAFLET_CONFIG = {
 }
 
 # Celery settings
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = config('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('REDIS_URL', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
