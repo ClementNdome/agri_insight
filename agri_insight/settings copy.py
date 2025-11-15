@@ -4,29 +4,39 @@ Django settings for agri_insight project.
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 from decouple import config
 import dj_database_url
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
+SECRET_KEY = config('SECRET_KEY', 'django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+# Update ALLOWED_HOSTS section - REPLACE the existing section with:
+ALLOWED_HOSTS= ("*")
 
-# For deployment environments (e.g., leapcell.io), add dynamic hosts
-if config('LEAPCELL_DEPLOYMENT', default=False, cast=bool) or config('PORT', default=None):
-    leapcell_domain = config('LEAPCELL_DOMAIN', default=None) or config('HOST', default=None)
-    if leapcell_domain:
-        ALLOWED_HOSTS.append(leapcell_domain)
+#TURNED OFF IN PRODUCTION
+#  GeoDjango settings
+# GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgdal.so')
+# GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgeos_c.so')
+
+# # Override for Windows development
+# if os.name == 'nt' and not config('PORT'):
+#     GDAL_LIBRARY_PATH = 'C:/OSGeo4W/bin/gdal310.dll'
+#     GEOS_LIBRARY_PATH = 'C:/OSGeo4W/bin/geos_c.dll'
+
 
 # Application definition
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin',  # Must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,29 +81,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'agri_insight.wsgi.application'
 
 # Database - PostgreSQL with PostGIS
+DB_NAME = config('DB_NAME')
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': config('DB_NAME'),
+        'NAME': DB_NAME,
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
-        'OPTIONS': {
-            'sslmode': config('DB_SSLMODE', default='require'),
-        },
+        'OPTIONS': {'sslmode': 'require'},
         'CONN_MAX_AGE': 600,
     }
 }
-
-# Optional: Add database URL support as fallback
-DATABASE_URL = config('DATABASE_URL', default=None)
-if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.parse(
-        DATABASE_URL,
-        engine='django.contrib.gis.db.backends.postgis',
-        conn_max_age=600,
-    )
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -141,17 +141,10 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/landing/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# GeoDjango settings - Only set library paths if needed
-if os.name == 'nt':  # Windows
-    GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='C:/OSGeo4W/bin/gdal310.dll')
-    GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='C:/OSGeo4W/bin/geos_c.dll')
-else:  # Linux/Production
-    GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='/usr/lib/x86_64-linux-gnu/libgdal.so')
-    GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='/usr/lib/x86_64-linux-gnu/libgeos_c.so')
 
 # Google Earth Engine settings
-GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = config('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH', default=None)
-GOOGLE_EARTH_ENGINE_PROJECT = config('GOOGLE_EARTH_ENGINE_PROJECT', default=None)
+GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = config('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH')
+GOOGLE_EARTH_ENGINE_PROJECT = config('GOOGLE_EARTH_ENGINE_PROJECT')
 
 # REST Framework settings
 REST_FRAMEWORK = {
@@ -194,8 +187,8 @@ LEAFLET_CONFIG = {
 }
 
 # Celery settings
-CELERY_BROKER_URL = config('REDIS_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://localhost:6379/0')
+CELERY_BROKER_URL = config('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('REDIS_URL', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -297,7 +290,7 @@ JAZZMIN_SETTINGS = {
     "custom_css": None,
     "custom_js": None,
     "use_google_fonts_cdn": True,
-    "show_ui_builder": True,
+    "show_ui_builder": False,
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
         "auth.user": "collapsible",
