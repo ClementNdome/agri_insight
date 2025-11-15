@@ -5,6 +5,7 @@ Django settings for agri_insight project.
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Load environment variables
 load_dotenv()
@@ -18,7 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-# Allowed hosts configuration
+# Update ALLOWED_HOSTS section - REPLACE the existing section with:
 allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 
