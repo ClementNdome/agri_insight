@@ -1,1 +1,1 @@
-web: gunicorn agri_insight.wsgi --log-file -
+gunicorn agri_insight.wsgi:application --bind 0.0.0.0:8080
