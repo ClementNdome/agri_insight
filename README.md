@@ -1,43 +1,47 @@
-# Forest Monitoring System
+# AgriInsight - Geospatial Agriculture Data Platform
 
-A comprehensive GIS system for monitoring forest areas using vegetation indices from Google Earth Engine. This system allows users to draw areas of interest on a map and analyze vegetation health using various satellite-derived indices.
+A comprehensive GIS-based platform for empowering farmers with real-time, data-driven insights into agricultural operations. This system allows users to define farm areas on an interactive map, analyze crop health using satellite-derived vegetation indices from Google Earth Engine, and receive AI-powered recommendations for yield optimization, irrigation, and sustainable practices.
 
 ## Features
 
-- **Interactive Map Interface**: Draw and manage areas of interest using Leaflet maps
-- **Vegetation Index Analysis**: Support for multiple vegetation indices (NDVI, EVI, SAVI, NDMI, NBR, NDWI, GNDVI, OSAVI)
-- **Google Earth Engine Integration**: Pull satellite data directly from Google Earth Engine using the GEEMAP API
-- **Real-time Monitoring**: Set up automated monitoring with configurable thresholds and alerts
-- **Data Visualization**: Charts and graphs for monitoring data analysis
-- **RESTful API**: Complete API for data access and integration
-- **PostGIS Database**: Spatial database support for geographic data
+- **Interactive Map Interface**: Draw and manage farm plots (areas of interest) using Leaflet maps with geospatial precision
+- **Vegetation Index Analysis**: Support for multiple vegetation indices (NDVI, EVI, SAVI, NDMI, NBR, NDWI, GNDVI, OSAVI) tailored for crop monitoring
+- **Google Earth Engine Integration**: Fetch high-resolution satellite data directly from Google Earth Engine via the GEEMAP API
+- **Real-Time Monitoring and AI Insights**: Automated alerts, yield predictions, and personalized recommendations using machine learning
+- **Data Visualization**: Interactive charts, dashboards, and exportable reports for historical trends and analytics
+- **RESTful API**: Secure, scalable API for data access, integration with third-party tools, and mobile apps
+- **PostGIS Database**: Robust spatial database support for geographic queries and data storage
+- **Mobile Responsiveness**: Optimized for field use on smartphones and tablets
 
 ## Technology Stack
 
-- **Backend**: Django 4.2 with GeoDjango
-- **Database**: PostgreSQL with PostGIS extension
-- **Frontend**: HTML5, JavaScript, Leaflet, Bootstrap 5
-- **Satellite Data**: Google Earth Engine API
-- **Spatial Processing**: GEEMAP, GDAL, GEOS
-- **Task Queue**: Celery with Redis
-- **API**: Django REST Framework
+- **Backend**: Django 5.1 with GeoDjango for geospatial capabilities
+- **Database**: PostgreSQL with PostGIS extension for spatial data handling
+- **Frontend**: HTML5, JavaScript, Leaflet.js, Bootstrap 5 for responsive UI
+- **Satellite Data**: Google Earth Engine API for remote sensing
+- **Spatial Processing**: GEEMAP, GDAL, GEOS, Geopandas, Rasterio
+- **AI/ML**: Scikit-learn and TensorFlow for predictive analytics (e.g., yield forecasting)
+- **Task Queue**: Celery with Redis for background processing
+- **API**: Django REST Framework with token authentication
+- **Visualization**: Matplotlib/Plotly for charts, Folium for embedded maps
 
 ## Prerequisites
 
 Before setting up the project, ensure you have the following installed:
 
-1. **Python 3.8+**
-2. **PostgreSQL 12+** with PostGIS extension
-3. **Redis** (for Celery task queue)
-4. **GDAL and GEOS libraries**
-5. **Google Earth Engine account** and credentials
+1. **Python 3.12+**
+2. **PostgreSQL 15+** with PostGIS extension
+3. **Redis** (for Celery task queue and caching)
+4. **GDAL and GEOS libraries** (for geospatial operations)
+5. **Google Earth Engine account** and service account credentials
+6. **Node.js** (optional, for frontend build tools like npm for Leaflet plugins)
 
 ### Installing GDAL and GEOS
 
 #### Windows
-1. Download and install [OSGeo4W](https://trac.osgeo.org/osgeo4w/)
-2. Add the bin directory to your PATH
-3. Set the library paths in your environment variables
+1. Download and install [OSGeo4W](https://trac.osgeo.org/osgeo4w/).
+2. Add the `bin` directory to your PATH environment variable.
+3. Set library paths (e.g., `GDAL_LIBRARY_PATH` and `GEOS_LIBRARY_PATH`).
 
 #### Linux (Ubuntu/Debian)
 ```bash
@@ -55,7 +59,7 @@ brew install gdal geos
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd forest-monitoring-system
+   cd agri-insight
    ```
 
 2. **Create a virtual environment**
@@ -71,18 +75,25 @@ brew install gdal geos
 
 4. **Set up environment variables**
    ```bash
-   cp env.example .env
-   # Edit .env with your configuration
+   cp .env.example .env
+   # Edit .env with your configuration (e.g., database credentials, GEE keys)
    ```
 
 5. **Set up PostgreSQL database**
    ```sql
-   CREATE DATABASE forest_monitoring;
+   CREATE DATABASE agri_insight;
+   CREATE USER agri_user WITH PASSWORD 'securepassword';
+   ALTER ROLE agri_user SET client_encoding TO 'utf8';
+   ALTER ROLE agri_user SET default_transaction_isolation TO 'read committed';
+   ALTER ROLE agri_user SET timezone TO 'UTC';
+   GRANT ALL PRIVILEGES ON DATABASE agri_insight TO agri_user;
+   \c agri_insight
    CREATE EXTENSION postgis;
    ```
 
 6. **Run migrations**
    ```bash
+   python manage.py makemigrations
    python manage.py migrate
    ```
 
@@ -104,12 +115,12 @@ brew install gdal geos
 ## Google Earth Engine Setup
 
 1. **Create a Google Cloud Project**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select an existing one
-   - Enable the Earth Engine API
+   - Visit the [Google Cloud Console](https://console.cloud.google.com/).
+   - Create a new project or select an existing one.
+   - Enable the Earth Engine API.
 
 2. **Set up authentication**
-   - Download your service account credentials JSON file
+   - Create a service account and download the JSON credentials file.
    - Set the path in your `.env` file:
      ```
      GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH=/path/to/your/credentials.json
@@ -129,50 +140,51 @@ brew install gdal geos
 ### Web Interface
 
 1. **Access the application**
-   - Open your browser and go to `http://localhost:8000`
-   - Log in with your superuser credentials
+   - Open your browser and navigate to `http://localhost:8000`.
+   - Sign up or log in (supports email verification and social logins via Google).
 
-2. **Create Areas of Interest**
-   - Click on the "Map" tab
-   - Use the "Draw Area" button to draw polygons on the map
-   - Fill in the area details and save
+2. **Define Farm Plots**
+   - Navigate to the "Dashboard" tab.
+   - Use the "Draw Area" tool to outline farm boundaries on the interactive map.
+   - Provide details like crop type and save the area.
 
-3. **Analyze Vegetation**
-   - Select a vegetation index from the dropdown
-   - Choose a date range
-   - Click "Analyze Area" to process the data
+3. **Analyze Crop Health**
+   - Select a vegetation index (e.g., NDVI for vigor assessment).
+   - Specify a date range and satellite source.
+   - Click "Analyze" to process data and view results overlaid on the map (styled with color ramps similar to Google Earth Engine).
 
-4. **Monitor Areas**
-   - Switch to the "Monitoring" tab
-   - Select an area and vegetation index
-   - View historical data and trends
+4. **Monitor and Get Insights**
+   - Access the "Monitoring" tab.
+   - View historical trends, AI-predicted yields, and recommendations (e.g., irrigation alerts).
+   - Export reports in PDF/CSV format.
 
 5. **Set up Alerts**
-   - Configure monitoring thresholds in the admin panel
-   - Set up automated monitoring schedules
+   - Configure thresholds in the user settings or admin panel.
+   - Enable automated notifications via email/SMS for events like drought or pest risks.
 
 ### API Usage
 
-The system provides a RESTful API for programmatic access:
+The platform offers a secure RESTful API for integration:
 
-#### Areas of Interest
+#### Areas of Interest (Farm Plots)
 ```bash
-# Get all areas
+# Get all farm plots
 GET /api/areas/
 
-# Create area from GeoJSON
+# Create farm plot from GeoJSON
 POST /api/areas/create_from_geojson/
 {
-    "name": "My Forest Area",
-    "description": "A forest monitoring area",
+    "name": "My Corn Field",
+    "description": "Primary crop monitoring area",
+    "crop_type": "corn",
     "geometry_geojson": {
         "type": "Polygon",
         "coordinates": [[[lon1, lat1], [lon2, lat2], ...]]
     }
 }
 
-# Get monitoring data for an area
-GET /api/areas/{id}/monitoring_data/?vegetation_index=NDVI&start_date=2023-01-01&end_date=2023-12-31
+# Get monitoring data for a farm plot
+GET /api/areas/{id}/monitoring_data/?vegetation_index=NDVI&start_date=2025-01-01&end_date=2025-12-31
 ```
 
 #### Monitoring Data
@@ -182,8 +194,8 @@ POST /api/monitoring-data/calculate/
 {
     "area_of_interest_id": 1,
     "vegetation_index_name": "NDVI",
-    "start_date": "2023-01-01",
-    "end_date": "2023-12-31",
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
     "satellite": "SENTINEL2"
 }
 
@@ -202,20 +214,20 @@ POST /api/alerts/{id}/resolve/
 
 ## Vegetation Indices
 
-The system supports the following vegetation indices:
+The platform supports key indices for agricultural analysis:
 
-- **NDVI**: Normalized Difference Vegetation Index
-- **EVI**: Enhanced Vegetation Index
-- **SAVI**: Soil Adjusted Vegetation Index
-- **NDMI**: Normalized Difference Moisture Index
-- **NBR**: Normalized Burn Ratio
-- **NDWI**: Normalized Difference Water Index
-- **GNDVI**: Green Normalized Difference Vegetation Index
-- **OSAVI**: Optimized Soil Adjusted Vegetation Index
+- **NDVI**: Normalized Difference Vegetation Index (crop vigor)
+- **EVI**: Enhanced Vegetation Index (improved sensitivity in high biomass)
+- **SAVI**: Soil Adjusted Vegetation Index (minimizes soil brightness)
+- **NDMI**: Normalized Difference Moisture Index (moisture stress detection)
+- **NBR**: Normalized Burn Ratio (post-fire or stress assessment)
+- **NDWI**: Normalized Difference Water Index (water content in vegetation)
+- **GNDVI**: Green Normalized Difference Vegetation Index (chlorophyll estimation)
+- **OSAVI**: Optimized Soil Adjusted Vegetation Index (canopy structure)
 
 ## Automated Monitoring
 
-Set up automated monitoring using Celery:
+Enable background processing with Celery:
 
 1. **Start Redis server**
    ```bash
@@ -224,7 +236,7 @@ Set up automated monitoring using Celery:
 
 2. **Start Celery worker**
    ```bash
-   celery -A forest_monitoring worker -l info
+   celery -A agri_insight worker -l info
    ```
 
 3. **Process monitoring data**
@@ -236,36 +248,37 @@ Set up automated monitoring using Celery:
 
 ### Monitoring Configuration
 
-Configure monitoring parameters for each area and vegetation index combination:
+Customize parameters per farm plot and index:
 
-- **Monitoring Frequency**: How often to check for new data
-- **Alert Thresholds**: Low and high thresholds for alerts
-- **Change Detection**: Percentage change threshold for alerts
-- **Cloud Cover Threshold**: Maximum cloud cover to use images
-- **Minimum Pixel Count**: Minimum pixels required for analysis
+- **Monitoring Frequency**: Daily/weekly checks for new satellite data
+- **Alert Thresholds**: Low/high values for crop health alerts
+- **Change Detection**: Percentage change for anomaly detection (e.g., sudden yield drop)
+- **Cloud Cover Threshold**: Max acceptable cloud in images (default: 20%)
+- **Minimum Pixel Count**: Ensure sufficient data for accurate analysis
 
 ### Alert Types
 
-- **Threshold Low**: Value below low threshold
-- **Threshold High**: Value above high threshold
-- **Change Detected**: Significant change from previous measurement
-- **Anomaly**: Statistical anomaly detected
+- **Threshold Low**: Below optimal crop health (e.g., drought indicator)
+- **Threshold High**: Above normal (e.g., overgrowth or flooding)
+- **Change Detected**: Significant variance from prior data (e.g., pest infestation)
+- **Anomaly**: AI-detected outliers (e.g., irregular soil moisture)
 
 ## Development
 
 ### Running Tests
 ```bash
-python manage.py test
+pytest
 ```
 
-### Code Style
+### Code Style and Linting
 ```bash
 # Install pre-commit hooks
 pre-commit install
 
-# Run linting
+# Run linting and formatting
 flake8 .
 black .
+mypy .
 ```
 
 ### Database Management
@@ -282,30 +295,27 @@ python manage.py flush
 
 ## Deployment
 
-### Leapcell.io Deployment
+### Heroku/AWS Deployment (Recommended for Scalability)
 
-For deploying to Leapcell.io, see the comprehensive guide in [LEAPCELL_DEPLOYMENT.md](LEAPCELL_DEPLOYMENT.md).
-
-Quick start:
-1. Connect your repository to Leapcell.io
-2. Set build command: `pip install -r requirements.txt && python manage.py collectstatic --noinput`
-3. Set start command: `gunicorn forest_monitoring.wsgi:application --bind 0.0.0.0:$PORT --workers 2`
-4. Configure environment variables (see LEAPCELL_DEPLOYMENT.md)
-5. Deploy!
+1. Configure `Procfile`: `web: gunicorn agri_insight.wsgi --bind 0.0.0.0:$PORT --workers 4`.
+2. Set buildpacks: Python, Node.js (if using frontend builds).
+3. Add add-ons: PostgreSQL, Redis.
+4. Deploy via Git: `git push heroku main`.
+5. Scale: `heroku ps:scale web=1 worker=1`.
 
 ### Production Settings
 
-1. **Set DEBUG=False**
-2. **Configure proper database settings**
-3. **Set up static file serving**
-4. **Configure email settings for alerts**
-5. **Set up monitoring and logging**
+1. Set `DEBUG=False` and `ALLOWED_HOSTS` in `.env`.
+2. Use a production database (e.g., AWS RDS).
+3. Configure static/media serving with WhiteNoise or S3.
+4. Set up email/SMS (e.g., SendGrid/Twilio) for alerts.
+5. Enable monitoring with Sentry for error tracking.
 
 ### Docker Deployment
 
 ```bash
 # Build and run with Docker Compose
-docker-compose up -d
+docker-compose up -d --build
 ```
 
 ## Troubleshooting
@@ -313,46 +323,45 @@ docker-compose up -d
 ### Common Issues
 
 1. **GDAL/GEOS Library Errors**
-   - Ensure GDAL and GEOS are properly installed
-   - Check library paths in environment variables
+   - Confirm installation and environment variables.
+   - Test with `gdalinfo --version`.
 
 2. **Google Earth Engine Authentication**
-   - Verify credentials file path
-   - Check project ID configuration
-   - Ensure Earth Engine API is enabled
+   - Check credentials file permissions and project API enablement.
+   - Run `ee.Authenticate()` in shell for verification.
 
 3. **Database Connection Issues**
-   - Verify PostgreSQL is running
-   - Check database credentials
-   - Ensure PostGIS extension is installed
+   - Verify PostgreSQL service status and credentials.
+   - Ensure PostGIS is enabled: `SELECT PostGIS_Version();`.
 
 4. **Celery Task Issues**
-   - Verify Redis is running
-   - Check Celery worker logs
-   - Ensure task imports are correct
+   - Check Redis connectivity.
+   - Review worker logs: `celery -A agri_insight inspect stats`.
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/new-feature`).
+3. Commit changes (`git commit -m "Add new feature"`).
+4. Add tests and ensure they pass.
+5. Push and open a pull request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-For support and questions:
-- Create an issue in the repository
-- Check the documentation
-- Review the troubleshooting section
+For questions or issues:
+- Open a GitHub issue.
+- Consult the documentation.
+- Join our community forum (link to be added).
 
 ## Acknowledgments
 
-- Google Earth Engine team for providing satellite data access
-- Django and GeoDjango communities
-- Leaflet and other open-source mapping libraries
-- PostGIS and PostgreSQL communities
+- Google Earth Engine team for satellite data access.
+- Django, GeoDjango, and open-source geospatial communities.
+- Leaflet.js and mapping library contributors.
+- PostgreSQL and PostGIS developers for robust spatial support.
+
+Thank you for using AgriInsight! For monetization inquiries or custom integrations, contact [support@agriinsight.com](mailto:info@spationex.com).
