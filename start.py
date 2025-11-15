@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Startup script for Forest Monitoring System
+Startup script for AgriInsight - Geospatial Agriculture Data Platform
 """
 
 import os
@@ -80,7 +80,7 @@ def start_services():
     # Start Django development server
     print("Starting Django development server...")
     print("=" * 50)
-    print("Forest Monitoring System is starting...")
+    print("AgriInsight - Geospatial Agriculture Data Platform is starting...")
     print("Access the application at: http://localhost:8000")
     print("Press Ctrl+C to stop the server")
     print("=" * 50)
@@ -95,7 +95,7 @@ def start_services():
 
 def main():
     """Main startup function"""
-    print("Forest Monitoring System Startup")
+    print("AgriInsight - Geospatial Agriculture Data Platform Startup")
     print("=" * 40)
     
     if not check_environment():

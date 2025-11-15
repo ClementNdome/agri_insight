@@ -18,22 +18,19 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-# Get allowed hosts from environment or default
+# Allowed hosts configuration
 allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 
-# For leapcell.io deployment, allow leapcell.dev subdomains
+# For deployment environments (e.g., leapcell.io), add dynamic hosts
 if os.getenv('LEAPCELL_DEPLOYMENT') == 'true' or os.getenv('PORT'):
-    # In production/deployment, allow all hosts if needed (leapcell handles routing)
-    # Or add specific domains from environment
     leapcell_domain = os.getenv('LEAPCELL_DOMAIN') or os.getenv('HOST')
     if leapcell_domain:
         ALLOWED_HOSTS.append(leapcell_domain)
-    # Allow all hosts in deployment (leapcell gateway handles security)
-    # Uncomment if needed: ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',  # Must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,14 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'rest_framework',
-    # 'corsheaders',  # Temporarily disabled
-    # 'leaflet',  # Temporarily disabled
     'accounts',
     'monitoring',
 ]
 
 MIDDLEWARE = [
-    # 'corsheaders.middleware.CorsMiddleware',  # Temporarily disabled
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'forest_monitoring.urls'
+ROOT_URLCONF = 'agri_insight.urls'
 
 TEMPLATES = [
     {
@@ -78,20 +72,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'forest_monitoring.wsgi.application'
+WSGI_APPLICATION = 'agri_insight.wsgi.application'
 
 # Database - PostgreSQL with PostGIS
+DB_NAME = os.getenv('DB_NAME')
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.getenv('DB_NAME'),
+        'NAME': DB_NAME,
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
-        'OPTIONS': {
-            'options': '-c search_path=public'
-        },
+        'OPTIONS': {'sslmode': 'require'},
         'CONN_MAX_AGE': 600,
     }
 }
@@ -121,9 +114,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Static files storage for production
 if not DEBUG:
@@ -145,18 +136,13 @@ LOGIN_REDIRECT_URL = '/landing/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # GeoDjango settings
-# Default to Linux paths (for production deployment)
-# Windows paths are used only if explicitly set
-default_gdal = os.getenv('GDAL_LIBRARY_PATH') or '/usr/lib/x86_64-linux-gnu/libgdal.so'
-default_geos = os.getenv('GEOS_LIBRARY_PATH') or '/usr/lib/x86_64-linux-gnu/libgeos_c.so'
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgdal.so')
+GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgeos_c.so')
 
-# Use Windows paths only if on Windows and not in deployment
+# Override for Windows development
 if os.name == 'nt' and not os.getenv('PORT'):
-    default_gdal = 'C:/OSGeo4W64/bin/gdal310.dll'
-    default_geos = 'C:/OSGeo4W/bin/geos_c.dll'
-
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', default_gdal)
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH', default_geos)
+    GDAL_LIBRARY_PATH = 'C:/OSGeo4W/bin/gdal310.dll'
+    GEOS_LIBRARY_PATH = 'C:/OSGeo4W/bin/geos_c.dll'
 
 # Google Earth Engine settings
 GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH = os.getenv('GOOGLE_EARTH_ENGINE_CREDENTIALS_PATH')
@@ -165,7 +151,7 @@ GOOGLE_EARTH_ENGINE_PROJECT = os.getenv('GOOGLE_EARTH_ENGINE_PROJECT')
 # REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # Temporarily allow all for testing
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -210,11 +196,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Logging
-import os
-from pathlib import Path
-
-# Ensure logs directory exists
+# Logging configuration
 logs_dir = BASE_DIR / 'logs'
 logs_dir.mkdir(exist_ok=True)
 
@@ -258,3 +240,96 @@ LOGGING = {
     },
 }
 
+# Jazzmin Admin Configuration
+JAZZMIN_SETTINGS = {
+    "site_title": "Agri Insight Admin",
+    "site_header": "Agri Insight",
+    "site_brand": "Agri Insight",
+    "site_logo_classes": "img-circle",
+    "welcome_sign": "Welcome to Agri Insight Admin",
+    "copyright": "Agri Insight Platform",
+    "search_model": ["accounts.User", "monitoring.AreaOfInterest"],
+    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Visit Site", "url": "home", "new_window": True},
+        {"model": "accounts.User"},
+        {"app": "monitoring"},
+    ],
+    "usermenu_links": [
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+        {"model": "auth.user"}
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["accounts", "monitoring"],
+    "custom_links": {
+        "monitoring": [{
+            "name": "View Site",
+            "url": "/",
+            "icon": "fas fa-globe",
+            "permissions": ["monitoring.view_areaofinterest"]
+        }]
+    },
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "accounts.User": "fas fa-user-circle",
+        "monitoring.AreaOfInterest": "fas fa-map-marked-alt",
+        "monitoring.VegetationIndex": "fas fa-leaf",
+        "monitoring.SatelliteImage": "fas fa-satellite",
+        "monitoring.MonitoringData": "fas fa-chart-line",
+        "monitoring.MonitoringAlert": "fas fa-bell",
+        "monitoring.MonitoringConfiguration": "fas fa-cog",
+        "monitoring.Tip": "fas fa-lightbulb",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": False,
+    "custom_css": None,
+    "custom_js": None,
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs"
+    },
+    "language_chooser": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}

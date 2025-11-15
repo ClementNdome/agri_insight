@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Deployment script for Forest Monitoring System
+Deployment script for AgriInsight - Geospatial Agriculture Data Platform
 """
 
 import os
@@ -100,7 +100,7 @@ def setup_systemd_services():
     # Django service
     django_service = """
 [Unit]
-Description=Forest Monitoring Django App
+Description=AgriInsight - Geospatial Agriculture Data Platform
 After=network.target
 
 [Service]
@@ -119,7 +119,7 @@ WantedBy=multi-user.target
     # Celery service
     celery_service = """
 [Unit]
-Description=Forest Monitoring Celery Worker
+Description=AgriInsight - Geospatial Agriculture Data Platform Celery Worker
 After=network.target
 
 [Service]
@@ -138,7 +138,7 @@ WantedBy=multi-user.target
     # Celery Beat service
     celery_beat_service = """
 [Unit]
-Description=Forest Monitoring Celery Beat
+Description=FAgriInsight - Geospatial Agriculture Data Platform Celery Beat
 After=network.target
 
 [Service]
@@ -169,13 +169,13 @@ WantedBy=multi-user.target
 def create_production_settings():
     """Create production settings file"""
     production_settings = """
-# Production settings for Forest Monitoring System
+# Production settings for AgriInsight - Geospatial Agriculture Data Platform
 import os
 from .settings import *
 
 # Security settings
 DEBUG = False
-ALLOWED_HOSTS = ['your-domain.com', 'www.your-domain.com']
+ALLOWED_HOSTS = ['*']
 
 # Database settings (use environment variables)
 DATABASES = {
@@ -255,7 +255,7 @@ CACHES = {
 
 def main():
     """Main deployment function"""
-    print("Forest Monitoring System Deployment")
+    print("AgriInsight - Geospatial Agriculture Data Platform")
     print("=" * 40)
     
     # Get executable paths

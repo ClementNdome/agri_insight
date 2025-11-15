@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Setup script for Forest Monitoring System
+Setup script for AgriInsight - Geospatial Agriculture Data Platform
 """
 
 import os
@@ -116,7 +116,7 @@ def create_directories():
 
 def main():
     """Main setup function"""
-    print("Forest Monitoring System Setup")
+    print("AgriInsight - Geospatial Agriculture Data Platform Setup")
     print("=" * 40)
     
     # Check Python version

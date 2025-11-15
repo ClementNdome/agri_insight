@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Google Earth Engine Authentication Setup Script
-This script helps you set up Google Earth Engine authentication for the Forest Monitoring System.
+This script helps you set up Google Earth Engine authentication for the AgriInsight - Geospatial Agriculture Data Platform.
 """
 
 import os
@@ -139,7 +139,7 @@ def test_gee_integration():
 
 def main():
     """Main setup function"""
-    print("🌍 Google Earth Engine Setup for Forest Monitoring System")
+    print("🌍 Google Earth Engine Setup for AgriInsight - Geospatial Agriculture Data Platform")
     print("=" * 60)
     
     # Step 1: Check installation

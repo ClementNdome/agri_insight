@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Google Earth Engine Setup Script for Forest Monitoring System
+Google Earth Engine Setup Script for AgriInsight - Geospatial Agriculture Data Platform
 """
 
 import os
@@ -130,7 +130,7 @@ def setup_environment_variables():
 
 def main():
     """Main setup function"""
-    print("Google Earth Engine Setup for Forest Monitoring System")
+    print("Google Earth Engine Setup for AgriInsight - Geospatial Agriculture Data Platform")
     print("=" * 60)
     
     # Check environment variables
@@ -153,7 +153,7 @@ def main():
     print("\nYou can now:")
     print("1. Run the Django development server: python manage.py runserver")
     print("2. Access the application at: http://localhost:8000")
-    print("3. Start monitoring forest areas with vegetation indices")
+    print("3. Start monitoring AgriInsight - Geospatial Agriculture Data Platform")
 
 if __name__ == '__main__':
     main()

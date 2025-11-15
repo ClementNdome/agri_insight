@@ -1,7 +1,0 @@
-tunnel: f74ee0d7-a20c-4e7c-a3ec-c81bb53a96c0
-credentials-file: C:\Users\HP\.cloudflared\f74ee0d7-a20c-4e7c-a3ec-c81bb53a96c0.json
-
-ingress:
-  - hostname: app.spationex.com
-    service: http://localhost:8000
-  - service: http_status:404

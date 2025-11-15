@@ -94,7 +94,7 @@ def get_polygon_centroid(geometry: GEOSGeometry) -> Tuple[float, float]:
 
 def validate_geometry(geometry: GEOSGeometry) -> bool:
     """
-    Validate geometry for forest monitoring
+    Validate geometry for Agri Insight
     
     Args:
         geometry: GEOSGeometry object
@@ -312,7 +312,7 @@ def get_vegetation_index_description(index_name: str) -> str:
         'OSAVI': 'Optimized Soil Adjusted Vegetation Index - optimized version of SAVI'
     }
     
-    return descriptions.get(index_name, 'Vegetation index for forest monitoring')
+    return descriptions.get(index_name, 'Vegetation index for Agri Insight')
 
 
 def get_vegetation_index_range(index_name: str) -> Tuple[float, float]:
