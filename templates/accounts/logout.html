@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Logout - Agri Insight{% endblock %}
 
@@ -8,85 +9,252 @@
 {% block extra_css %}
 <style>
     body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 1rem;
+        font-family: 'Inter', sans-serif;
     }
+    
+    .logout-container {
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
     .logout-card {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         padding: 3rem;
-        max-width: 500px;
-        width: 100%;
+        position: relative;
+        overflow: hidden;
         text-align: center;
     }
-    .logo {
+    
+    .logout-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
+    }
+    
+    .logo-section {
         margin-bottom: 2rem;
     }
-    .logo h1 {
-        color: #667eea;
-        font-weight: bold;
-    }
-    .logout-icon {
-        font-size: 4rem;
-        color: #667eea;
-        margin-bottom: 1.5rem;
-    }
-    .btn-group {
-        display: flex;
-        gap: 1rem;
+    
+    .logo {
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+    }
+    
+    .logo-text {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2E8B57;
+    }
+    
+    .logout-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .btn-logout {
+        background: linear-gradient(135deg, #2E8B57 0%, #228B22 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-logout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(46, 139, 87, 0.3);
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid #2E8B57;
+        color: #2E8B57;
+        border-radius: 10px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #2E8B57;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-group-vertical {
+        gap: 0.75rem;
         margin-top: 2rem;
+    }
+    
+    .success-message {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid #28a745;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 576px) {
+        body {
+            padding: 0.5rem;
+        }
+        
+        .logout-card {
+            padding: 2rem 1.5rem;
+            border-radius: 15px;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+        
+        .logout-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .logout-card {
+            padding: 1.5rem 1rem;
+        }
+        
+        .logo {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .logo-icon {
+            margin-right: 0;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="logout-container">
     <div class="logout-card">
-        <div class="logo">
-            <h1><i class="fas fa-seedling"></i> Agri Insight</h1>
+        <div class="logo-section">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="logo-text">Agri Insight</div>
+            </div>
         </div>
         
+        {% if user.is_authenticated %}
         <div class="logout-icon">
             <i class="fas fa-sign-out-alt"></i>
         </div>
         
-        {% if user.is_authenticated %}
-        <h3>Confirm Logout</h3>
-        <p class="text-muted">Are you sure you want to logout?</p>
+        <h3 class="mb-3 text-dark">Confirm Logout</h3>
+        <p class="text-muted mb-4">Are you sure you want to sign out of your account?</p>
         
         <form method="post" action="{% url 'accounts:logout' %}">
             {% csrf_token %}
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sign-out-alt"></i> Yes, Logout
+            <div class="btn-group-vertical">
+                <button type="submit" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt me-2"></i>Yes, Logout
                 </button>
                 <a href="{% url 'landing' %}" class="btn btn-outline-primary">
-                    <i class="fas fa-times"></i> Cancel
+                    <i class="fas fa-times me-2"></i>Cancel & Return
                 </a>
             </div>
         </form>
         {% else %}
-        <h3>You have been logged out</h3>
-        <p class="text-muted">Thank you for using Agri Insight. We hope to see you again soon!</p>
+        <div class="logout-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+            <i class="fas fa-check-circle"></i>
+        </div>
         
-        <div class="btn-group">
-            <a href="{% url 'accounts:login' %}" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> Login Again
+        <h3 class="mb-3 text-dark">Successfully Logged Out</h3>
+        <p class="text-muted mb-4">You have been safely signed out of your account.</p>
+        
+        <div class="success-message text-start">
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-shield-check text-success me-2"></i>
+                <strong>Account Secured</strong>
+            </div>
+            <p class="text-muted small mb-0">Your session has been securely terminated. Thank you for using Agri Insight!</p>
+        </div>
+        
+        <div class="btn-group-vertical">
+            <a href="{% url 'accounts:login' %}" class="btn btn-logout">
+                <i class="fas fa-sign-in-alt me-2"></i>Login Again
             </a>
             <a href="{% url 'landing' %}" class="btn btn-outline-primary">
-                <i class="fas fa-home"></i> Go Home
+                <i class="fas fa-home me-2"></i>Return to Homepage
+            </a>
+            <a href="{% url 'demo' %}" class="btn btn-outline-primary">
+                <i class="fas fa-eye me-2"></i>View Demo
             </a>
         </div>
         {% endif %}
+        
+        <!-- Security Notice -->
+        <div class="mt-4 pt-3 border-top">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                For security, please close your browser if you're on a shared device.
+            </small>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block footer %}
 {% endblock %}
-
