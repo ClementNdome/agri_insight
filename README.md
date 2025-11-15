@@ -1,4 +1,4 @@
-# AgriInsight - Geospatial Agriculture Data Platform
+# [AgriInsight - Geospatial Agriculture Data Platform](https://agri-insight.spationex.com)
 
 A comprehensive GIS-based platform for empowering farmers with real-time, data-driven insights into agricultural operations. This system allows users to define farm areas on an interactive map, analyze crop health using satellite-derived vegetation indices from Google Earth Engine, and receive AI-powered recommendations for yield optimization, irrigation, and sustainable practices.
 
@@ -58,8 +58,8 @@ brew install gdal geos
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd agri-insight
+   git clone https://github.com/ClementNdome/agri_insight.git
+   cd agri_insight
    ```
 
 2. **Create a virtual environment**
@@ -298,7 +298,7 @@ python manage.py flush
 ### Heroku/AWS Deployment (Recommended for Scalability)
 
 1. Configure `Procfile`: `web: gunicorn agri_insight.wsgi --bind 0.0.0.0:$PORT --workers 4`.
-2. Set buildpacks: Python, Node.js (if using frontend builds).
+2. Set buildpacks: Python, Node.js (if using using frontend builds).
 3. Add add-ons: PostgreSQL, Redis.
 4. Deploy via Git: `git push heroku main`.
 5. Scale: `heroku ps:scale web=1 worker=1`.
@@ -364,4 +364,4 @@ For questions or issues:
 - Leaflet.js and mapping library contributors.
 - PostgreSQL and PostGIS developers for robust spatial support.
 
-Thank you for using AgriInsight! For monetization inquiries or custom integrations, contact [support@agriinsight.com](mailto:info@spationex.com).
+Thank you for using AgriInsight! For collaborations, monetization inquiries, or custom integrations, contact [clementndome20@gmail.com](mailto:clementndome20@gmail.com).
