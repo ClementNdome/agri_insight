@@ -68,7 +68,7 @@ def start_services():
     # Start Celery worker in background
     print("Starting Celery worker...")
     celery_process = subprocess.Popen(
-        f'{python_executable} -m celery -A forest_monitoring worker -l info',
+        f'{python_executable} -m celery -A monitoring worker -l info',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
