@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Deployment script for AgriInsight - Geospatial Agriculture Data Platform
 """
@@ -9,11 +8,14 @@ import subprocess
 import shutil
 from pathlib import Path
 
+
 def run_command(command, description, check=True):
     """Run a command and handle errors"""
     print(f"Running: {description}")
     try:
-        result = subprocess.run(command, shell=True, check=check, capture_output=True, text=True)
+        result = subprocess.run(
+            command, shell=True, check=check, capture_output=True, text=True
+        )
         print(f"✓ {description} completed successfully")
         return True
     except subprocess.CalledProcessError as e:
@@ -21,47 +23,51 @@ def run_command(command, description, check=True):
         print(f"Error output: {e.stderr}")
         return False
 
+
 def collect_static_files(python_executable):
     """Collect static files for production"""
     return run_command(
-        f'{python_executable} manage.py collectstatic --noinput',
-        'Collecting static files'
+        f"{python_executable} manage.py collectstatic --noinput",
+        "Collecting static files",
     )
+
 
 def run_migrations(python_executable):
     """Run database migrations"""
     return run_command(
-        f'{python_executable} manage.py migrate',
-        'Running database migrations'
+        f"{python_executable} manage.py migrate", "Running database migrations"
     )
+
 
 def create_superuser(python_executable):
     """Create superuser if it doesn't exist"""
     # Check if superuser exists
     check_command = f'{python_executable} manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(is_superuser=True).exists())"'
     result = subprocess.run(check_command, shell=True, capture_output=True, text=True)
-    
-    if 'True' in result.stdout:
+
+    if "True" in result.stdout:
         print("✓ Superuser already exists")
         return True
-    
+
     print("Creating superuser...")
     print("Please provide the following information:")
     return run_command(
-        f'{python_executable} manage.py createsuperuser',
-        'Creating superuser',
-        check=False
+        f"{python_executable} manage.py createsuperuser",
+        "Creating superuser",
+        check=False,
     )
+
 
 def setup_logging():
     """Set up logging directories"""
-    log_dirs = ['logs', 'logs/django', 'logs/celery']
-    
+    log_dirs = ["logs", "logs/django", "logs/celery"]
+
     for log_dir in log_dirs:
         Path(log_dir).mkdir(parents=True, exist_ok=True)
         print(f"✓ Created log directory: {log_dir}")
-    
+
     return True
+
 
 def setup_nginx_config():
     """Create nginx configuration template"""
@@ -87,16 +93,17 @@ server {
     }
 }
 """
-    
-    with open('nginx.conf', 'w') as f:
+
+    with open("nginx.conf", "w") as f:
         f.write(nginx_config)
-    
+
     print("✓ Created nginx configuration template")
     return True
 
+
 def setup_systemd_services():
     """Create systemd service files"""
-    
+
     # Django service
     django_service = """
 [Unit]
@@ -115,7 +122,7 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 """
-    
+
     # Celery service
     celery_service = """
 [Unit]
@@ -134,7 +141,7 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 """
-    
+
     # Celery Beat service
     celery_beat_service = """
 [Unit]
@@ -153,18 +160,19 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 """
-    
-    with open('forest-monitoring.service', 'w') as f:
+
+    with open("forest-monitoring.service", "w") as f:
         f.write(django_service)
-    
-    with open('forest-monitoring-celery.service', 'w') as f:
+
+    with open("forest-monitoring-celery.service", "w") as f:
         f.write(celery_service)
-    
-    with open('forest-monitoring-celery-beat.service', 'w') as f:
+
+    with open("forest-monitoring-celery-beat.service", "w") as f:
         f.write(celery_beat_service)
-    
+
     print("✓ Created systemd service files")
     return True
+
 
 def create_production_settings():
     """Create production settings file"""
@@ -246,60 +254,61 @@ CACHES = {
     }
 }
 """
-    
-    with open('forest_monitoring/production_settings.py', 'w') as f:
+
+    with open("forest_monitoring/production_settings.py", "w") as f:
         f.write(production_settings)
-    
+
     print("✓ Created production settings file")
     return True
+
 
 def main():
     """Main deployment function"""
     print("AgriInsight - Geospatial Agriculture Data Platform")
     print("=" * 40)
-    
+
     # Get executable paths
-    if sys.platform == 'win32':
-        python_executable = 'venv\\Scripts\\python.exe'
+    if sys.platform == "win32":
+        python_executable = "venv\\Scripts\\python.exe"
     else:
-        python_executable = 'venv/bin/python'
-    
+        python_executable = "venv/bin/python"
+
     # Check if virtual environment exists
-    if not os.path.exists('venv'):
+    if not os.path.exists("venv"):
         print("✗ Virtual environment not found. Please run setup.py first.")
         sys.exit(1)
-    
+
     # Set up logging
     print("\nSetting up logging...")
     if not setup_logging():
         sys.exit(1)
-    
+
     # Run migrations
     print("\nRunning database migrations...")
     if not run_migrations(python_executable):
         sys.exit(1)
-    
+
     # Create superuser
     print("\nSetting up superuser...")
     if not create_superuser(python_executable):
         print("Warning: Superuser creation failed or was skipped")
-    
+
     # Collect static files
     print("\nCollecting static files...")
     if not collect_static_files(python_executable):
         sys.exit(1)
-    
+
     # Create production configuration files
     print("\nCreating production configuration...")
     if not setup_nginx_config():
         sys.exit(1)
-    
+
     if not setup_systemd_services():
         sys.exit(1)
-    
+
     if not create_production_settings():
         sys.exit(1)
-    
+
     print("\n" + "=" * 40)
     print("Deployment preparation completed!")
     print("\nNext steps for production deployment:")
@@ -317,5 +326,6 @@ def main():
     print("6. Configure firewall rules")
     print("\nFor Docker deployment, use: docker-compose up -d")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
