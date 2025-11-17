@@ -142,7 +142,7 @@ def main():
     print("🌍 Google Earth Engine Setup for AgriInsight - Geospatial Agriculture Data Platform")
     print("=" * 60)
     
-    # Step 1: Check installation
+   
     if not check_ee_installation():
         return False
     

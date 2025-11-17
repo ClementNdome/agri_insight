@@ -138,7 +138,7 @@ def main():
         print("\nPlease configure your .env file and run this script again")
         return
     
-    # Check credentials file
+    #
     if not check_credentials_file():
         print("\nPlease obtain your credentials file and run this script again")
         return
