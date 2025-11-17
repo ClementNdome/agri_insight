@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Google Earth Engine Authentication Setup Script
 This script helps you set up Google Earth Engine authentication for the AgriInsight - Geospatial Agriculture Data Platform.

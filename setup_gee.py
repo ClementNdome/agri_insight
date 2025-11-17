@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Google Earth Engine Setup Script for AgriInsight - Geospatial Agriculture Data Platform
 """
